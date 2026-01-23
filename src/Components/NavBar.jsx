@@ -1,16 +1,16 @@
-import { Link } from "react-router-dom";
-
+import { NavLink } from "react-router-dom"; // Change Link to NavLink
+import "./css/NavBar.css";
 function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-       <Link to="/">MovieApp</Link>
+        <NavLink to="/">Movie App</NavLink>
       </div>
       <div className="navbar-links">
-        <Link to="/" className="nav-link">Home</Link>
-        <Link to="/favourites" className="nav-link">Favourites</Link>
+        <NavLink to="/" className="nav-link">Home</NavLink>
+        <NavLink to="/favourites" className="nav-link">Favorites</NavLink>
       </div>
     </nav>
   );
 }
-export default NavBar;  
+export default NavBar;

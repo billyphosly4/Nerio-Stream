@@ -1,0 +1,51 @@
+.home {
+    padding: 20px;
+    width: 100%;
+}
+
+/* Search Form Styles */
+.search-form {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: #00d4ff;
+}
+
+.search-button {
+    padding: 12px 24px;
+    background-color: #00d4ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-button:hover {
+    background-color: #008fb3;
+}
+
+/* Movie Grid - The Important Part */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+    justify-items: center;
+}

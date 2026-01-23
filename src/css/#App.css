@@ -1,0 +1,31 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Main Container Spacing */
+.main-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto; /* Centers the content */
+  min-height: calc(100vh - 60px); /* Adjust 60px to your NavBar's height */
+}
+
+/* Optional: Simple transitions for Route changes */
+.main-content {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
