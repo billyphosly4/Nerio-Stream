@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"; // Change Link to NavLink
-import "./css/NavBar.css";
+import "../css/NavBar.css";
 function NavBar() {
   return (
     <nav className="navbar">
@@ -7,8 +7,8 @@ function NavBar() {
         <NavLink to="/">Movie App</NavLink>
       </div>
       <div className="navbar-links">
-        <NavLink to="/" className="nav-link">Home</NavLink>
-        <NavLink to="/favourites" className="nav-link">Favorites</NavLink>
+        <NavLink to="/" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Home</NavLink>
+        <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Favorites</NavLink>
       </div>
     </nav>
   );

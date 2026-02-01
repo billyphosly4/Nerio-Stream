@@ -59,7 +59,7 @@
 
 .favourite-btn:hover {
     transform: scale(1.2);
-    color: #ff4757;
+    color: var(--primary-color);
 }
 
 .movie-info {

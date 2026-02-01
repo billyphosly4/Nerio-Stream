@@ -1,9 +1,21 @@
-import { useMovieContext } from "../contexts/MovieContext";
+// ...existing code...
+import React from "react";
+import { useMovieContext } from "../Contexts/MovieContexts";
 import MovieCard from "../Components/MovieCard";
-import "./css/Favourites.css";
+import "../css/Favourites.css";
 
 function Favourites() {
     const { favorites } = useMovieContext();
+
+    // added guard to avoid runtime error if favorites is undefined or not an array
+    if (!Array.isArray(favorites) || favorites.length === 0) {
+        return (
+            <div className="favourites-empty">
+                <h2>No favorites yet</h2>
+                <p>Start adding movies to your favorites and they will appear here!</p>
+            </div>
+        );
+    }
 
     if (favorites.length > 0) {
         return (

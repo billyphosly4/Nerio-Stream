@@ -1,5 +1,5 @@
 .navbar {
-    background-color: #222;
+    background-color: var(--card-bg);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
@@ -11,7 +11,7 @@
 }
 
 .navbar-brand a {
-    color: white;
+    color: var(--text-color);
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
@@ -25,17 +25,17 @@
 }
 
 .nav-link {
-    color: white;
+    color: var(--text-color);
     text-decoration: none;
     font-size: 1.1rem;
     transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-    color: #e50914; /* Cinema Red */
+    color: var(--primary-color);
 }
 .nav-link.active {
-    color: #e50914;
+    color: var(--primary-color);
     font-weight: bold;
-    border-bottom: 2px solid #e50914;
+    border-bottom: 2px solid var(--primary-color);
 }
