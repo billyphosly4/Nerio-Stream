@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMovieDetails, getSimilarMovies } from "../Components/Apis";
+import { getMovieDetails, getSimilarMovies, getMovieEmbedUrl } from "../Components/Apis";
 import { useMovieContext } from "../Contexts/MovieContexts";
 import MovieCard from "../Components/MovieCard";
+import VideoPlayer from "../Components/VideoPlayer";
 import "../css/MovieDetail.css";
 
 function MovieDetail() {
@@ -13,7 +14,9 @@ function MovieDetail() {
     const [similar, setSimilar] = useState([]);
     const [loading, setLoading] = useState(true);
     const [trailerKey, setTrailerKey] = useState(null);
-    const [showTrailer, setShowTrailer] = useState(false);
+    const [showPlayer, setShowPlayer] = useState(false);
+    const [playerSrc, setPlayerSrc] = useState("");
+    const [playerTitle, setPlayerTitle] = useState("");
 
     const favorite = movie ? isFavorite(movie.id) : false;
 
@@ -27,7 +30,6 @@ function MovieDetail() {
             ]);
             setMovie(details);
             setSimilar(similarMovies.slice(0, 8));
-            // Find trailer
             if (details?.videos?.results) {
                 const trailer = details.videos.results.find(
                     v => v.type === "Trailer" && v.site === "YouTube"
@@ -38,6 +40,19 @@ function MovieDetail() {
         };
         loadDetails();
     }, [id]);
+
+    const openMovie = () => {
+        setPlayerSrc(getMovieEmbedUrl(id));
+        setPlayerTitle(movie?.title || "Movie");
+        setShowPlayer(true);
+    };
+
+    const openTrailer = () => {
+        if (!trailerKey) return;
+        setPlayerSrc(`https://www.youtube.com/embed/${trailerKey}?autoplay=1`);
+        setPlayerTitle(`${movie?.title} — Trailer`);
+        setShowPlayer(true);
+    };
 
     if (loading) {
         return (
@@ -70,6 +85,15 @@ function MovieDetail() {
 
     return (
         <div className="movie-detail">
+            {/* Video Player Modal */}
+            {showPlayer && (
+                <VideoPlayer
+                    src={playerSrc}
+                    title={playerTitle}
+                    onClose={() => setShowPlayer(false)}
+                />
+            )}
+
             {/* Hero Backdrop */}
             <div
                 className="detail-backdrop"
@@ -83,9 +107,7 @@ function MovieDetail() {
             </div>
 
             <div className="detail-content">
-                <button className="back-btn" onClick={() => navigate(-1)}>
-                    ← Back
-                </button>
+                <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
 
                 <div className="detail-main">
                     {/* Poster */}
@@ -124,9 +146,7 @@ function MovieDetail() {
                             {directors.length > 0 && (
                                 <div className="meta-item">
                                     <span className="meta-label">Director</span>
-                                    <span className="meta-value">
-                                        {directors.map(d => d.name).join(", ")}
-                                    </span>
+                                    <span className="meta-value">{directors.map(d => d.name).join(", ")}</span>
                                 </div>
                             )}
                             {movie.vote_count > 0 && (
@@ -150,25 +170,28 @@ function MovieDetail() {
                         </div>
 
                         <div className="detail-actions">
+                            {/* Primary: Watch Now */}
+                            <button className="watch-now-btn" onClick={openMovie}>
+                                ▶ Watch Now
+                            </button>
+                            {/* Trailer */}
+                            {trailerKey && (
+                                <button className="trailer-btn" onClick={openTrailer}>
+                                    🎬 Trailer
+                                </button>
+                            )}
+                            {/* Favourite */}
                             <button
                                 className={`fav-action-btn ${favorite ? "active" : ""}`}
                                 onClick={() => favorite ? removeFromFavorites(movie.id) : addToFavorites(movie)}
                             >
-                                {favorite ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
+                                {favorite ? "❤️" : "🤍"}
                             </button>
-                            {trailerKey && (
-                                <button
-                                    className="trailer-btn"
-                                    onClick={() => setShowTrailer(true)}
-                                >
-                                    ▶ Watch Trailer
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Cast Section */}
+                {/* Cast */}
                 {cast.length > 0 && (
                     <div className="cast-section">
                         <h2 className="section-title">Top Cast</h2>
@@ -194,31 +217,13 @@ function MovieDetail() {
                 {/* Similar Movies */}
                 {similar.length > 0 && (
                     <div className="similar-section">
-                        <h2 className="section-title">Similar Movies</h2>
+                        <h2 className="section-title">More Like This</h2>
                         <div className="movie-grid">
-                            {similar.map(m => (
-                                <MovieCard movie={m} key={m.id} />
-                            ))}
+                            {similar.map(m => <MovieCard movie={m} key={m.id} />)}
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* Trailer Modal */}
-            {showTrailer && trailerKey && (
-                <div className="trailer-modal" onClick={() => setShowTrailer(false)}>
-                    <div className="trailer-container" onClick={e => e.stopPropagation()}>
-                        <button className="close-trailer" onClick={() => setShowTrailer(false)}>✕</button>
-                        <iframe
-                            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
-                            title="Trailer"
-                            frameBorder="0"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                        />
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

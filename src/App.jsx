@@ -4,6 +4,8 @@ import NavBar from './Components/NavBar';
 import Home from './Pages/Home';
 import Trending from './Pages/Trending';
 import MovieDetail from './Pages/MovieDetail';
+import TVShows from './Pages/TVShows';
+import TVDetail from './Pages/TVDetail';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -12,10 +14,12 @@ function App() {
       <NavBar />
       <main className="main-content">
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/favourites' element={<Favourites />} />
-          <Route path='/trending' element={<Trending />} />
-          <Route path='/movie/:id' element={<MovieDetail />} />
+          <Route path='/'               element={<Home />} />
+          <Route path='/trending'       element={<Trending />} />
+          <Route path='/tv'             element={<TVShows />} />
+          <Route path='/favourites'     element={<Favourites />} />
+          <Route path='/movie/:id'      element={<MovieDetail />} />
+          <Route path='/tv/:id'         element={<TVDetail />} />
         </Routes>
       </main>
     </div>

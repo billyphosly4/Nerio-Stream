@@ -240,3 +240,16 @@
     margin: 0;
     font-weight: 500;
 }
+
+/* TV Show badge */
+.tv-badge {
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: auto;
+    align-self: flex-end;
+}

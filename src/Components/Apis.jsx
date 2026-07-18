@@ -1,95 +1,121 @@
 const API_KEY = "c9bff9d37b7004fbd0de5008cbd01501";
 const BASE_URL = "https://api.themoviedb.org/3";
 
+// ─── Embed URLs (vidsrc.to) ────────────────────────────────────────────────
+export const getMovieEmbedUrl = (tmdbId) =>
+    `https://vidsrc.to/embed/movie/${tmdbId}`;
+
+export const getTVEpisodeEmbedUrl = (tmdbId, season, episode) =>
+    `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`;
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
 async function fetchJSON(url) {
     const res = await fetch(url);
     if (!res.ok) {
         const txt = await res.text().catch(() => '');
-        const msg = `Request failed (${res.status}): ${txt}`;
-        throw new Error(msg);
+        throw new Error(`Request failed (${res.status}): ${txt}`);
     }
     return res.json();
 }
 
+// ─── Movies ───────────────────────────────────────────────────────────────
 export const getPopularMovies = async (page = 1) => {
     try {
         const data = await fetchJSON(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
         return data.results || [];
-    } catch (err) {
-        console.error('getPopularMovies error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
 export const searchMovies = async (query, page = 1) => {
     if (!query) return [];
     try {
-        const data = await fetchJSON(
-            `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
-        );
+        const data = await fetchJSON(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
         return data.results || [];
-    } catch (err) {
-        console.error('searchMovies error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
 export const getGenres = async () => {
     try {
         const data = await fetchJSON(`${BASE_URL}/genre/movie/list?api_key=${API_KEY}`);
         return data.genres || [];
-    } catch (err) {
-        console.error('getGenres error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
 export const getMoviesByGenre = async (genreId, page = 1) => {
     try {
         const data = await fetchJSON(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&page=${page}`);
         return data.results || [];
-    } catch (err) {
-        console.error('getMoviesByGenre error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
 export const getMovieDetails = async (movieId) => {
     try {
         const data = await fetchJSON(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos`);
         return data;
-    } catch (err) {
-        console.error('getMovieDetails error:', err);
-        return null;
-    }
+    } catch (err) { console.error(err); return null; }
 };
 
 export const getSimilarMovies = async (movieId) => {
     try {
         const data = await fetchJSON(`${BASE_URL}/movie/${movieId}/similar?api_key=${API_KEY}`);
         return data.results || [];
-    } catch (err) {
-        console.error('getSimilarMovies error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
 export const getTrending = async (timeWindow = 'week') => {
     try {
         const data = await fetchJSON(`${BASE_URL}/trending/movie/${timeWindow}?api_key=${API_KEY}`);
         return data.results || [];
-    } catch (err) {
-        console.error('getTrending error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
 };
 
+// ─── TV Shows ─────────────────────────────────────────────────────────────
 export const getTVShows = async (page = 1) => {
     try {
         const data = await fetchJSON(`${BASE_URL}/tv/popular?api_key=${API_KEY}&page=${page}`);
         return data.results || [];
-    } catch (err) {
-        console.error('getTVShows error:', err);
-        return [];
-    }
+    } catch (err) { console.error(err); return []; }
+};
+
+export const searchTV = async (query, page = 1) => {
+    if (!query) return [];
+    try {
+        const data = await fetchJSON(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
+        return data.results || [];
+    } catch (err) { console.error(err); return []; }
+};
+
+export const getTVDetails = async (tvId) => {
+    try {
+        const data = await fetchJSON(`${BASE_URL}/tv/${tvId}?api_key=${API_KEY}&append_to_response=credits,videos`);
+        return data;
+    } catch (err) { console.error(err); return null; }
+};
+
+export const getTVSeasonDetails = async (tvId, seasonNumber) => {
+    try {
+        const data = await fetchJSON(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
+        return data;
+    } catch (err) { console.error(err); return null; }
+};
+
+export const getSimilarTV = async (tvId) => {
+    try {
+        const data = await fetchJSON(`${BASE_URL}/tv/${tvId}/similar?api_key=${API_KEY}`);
+        return data.results || [];
+    } catch (err) { console.error(err); return []; }
+};
+
+export const getTVGenres = async () => {
+    try {
+        const data = await fetchJSON(`${BASE_URL}/genre/tv/list?api_key=${API_KEY}`);
+        return data.genres || [];
+    } catch (err) { console.error(err); return []; }
+};
+
+export const getTVByGenre = async (genreId, page = 1) => {
+    try {
+        const data = await fetchJSON(`${BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&page=${page}`);
+        return data.results || [];
+    } catch (err) { console.error(err); return []; }
 };

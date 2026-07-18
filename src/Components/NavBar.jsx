@@ -9,10 +9,13 @@ function NavBar() {
       </div>
       <div className="navbar-links">
         <NavLink to="/" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} end>
-          Home
+          Movies
         </NavLink>
         <NavLink to="/trending" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           🔥 Trending
+        </NavLink>
+        <NavLink to="/tv" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          📺 TV Shows
         </NavLink>
         <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           ❤️ Favorites

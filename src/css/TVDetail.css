@@ -1,0 +1,269 @@
+/* ── Seasons Section ── */
+.seasons-section {
+    margin-bottom: 4rem;
+}
+
+.seasons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ── Season Accordion Item ── */
+.season-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.season-item.open {
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── Season Header Button ── */
+.season-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: transparent;
+    cursor: pointer;
+    gap: 1rem;
+    text-align: left;
+    border: none;
+    color: var(--text-color);
+    transition: background 0.2s ease;
+}
+
+.season-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.season-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.season-thumb {
+    width: 44px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.season-thumb-placeholder {
+    width: 44px;
+    height: 66px;
+    border-radius: 6px;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #a5b4fc;
+    flex-shrink: 0;
+}
+
+.season-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.season-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.season-ep-count {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.season-chevron {
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.season-chevron.up {
+    transform: rotate(180deg);
+    color: #a5b4fc;
+}
+
+/* ── Episodes List ── */
+.episodes-list {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.episodes-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem;
+    color: var(--text-muted);
+}
+
+.no-eps {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    margin: 0;
+}
+
+/* ── Episode Card ── */
+.episode-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.episode-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* ── Episode Thumbnail ── */
+.ep-thumb-wrap {
+    position: relative;
+    width: 160px;
+    min-width: 160px;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #1e293b;
+}
+
+.ep-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.ep-thumb-wrap:hover .ep-thumb {
+    transform: scale(1.05);
+}
+
+.ep-play-btn {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.ep-thumb-wrap:hover .ep-play-btn {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.ep-play-btn:hover {
+    font-size: 2.4rem;
+}
+
+/* ── Episode Info ── */
+.ep-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ep-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.ep-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1.3;
+}
+
+.ep-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.ep-overview {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 4px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ep-rating {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-top: 4px;
+}
+
+/* ── Small Loader ── */
+.loader-sm {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-bottom-color: var(--primary-color);
+    border-radius: 50%;
+    animation: rotation 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .episode-card {
+        flex-direction: column;
+    }
+
+    .ep-thumb-wrap {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .season-header {
+        padding: 12px;
+    }
+}
