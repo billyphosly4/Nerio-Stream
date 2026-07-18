@@ -50,7 +50,7 @@ export const getMoviesByGenre = async (genreId, page = 1) => {
 
 export const getMovieDetails = async (movieId) => {
     try {
-        const data = await fetchJSON(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,watch/providers`);
+        const data = await fetchJSON(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos`);
         return data;
     } catch (err) { console.error(err); return null; }
 };
@@ -87,7 +87,7 @@ export const searchTV = async (query, page = 1) => {
 
 export const getTVDetails = async (tvId) => {
     try {
-        const data = await fetchJSON(`${BASE_URL}/tv/${tvId}?api_key=${API_KEY}&append_to_response=credits,videos,watch/providers`);
+        const data = await fetchJSON(`${BASE_URL}/tv/${tvId}?api_key=${API_KEY}&append_to_response=credits,videos`);
         return data;
     } catch (err) { console.error(err); return null; }
 };
