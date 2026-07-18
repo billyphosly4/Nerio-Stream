@@ -3,15 +3,19 @@ import "../css/VideoPlayer.css";
 
 // Multiple embed sources as fallbacks
 const MOVIE_SOURCES = (id) => [
-    `https://vidsrc.to/embed/movie/${id}`,
-    `https://2embed.cc/embed/${id}`,
-    `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`,
+    `https://vidsrc.cc/v2/embed/movie/${id}`,
+    `https://embed.su/embed/movie/${id}`,
+    `https://vidsrc.me/embed/movie?tmdb=${id}`,
+    `https://vidsrc.xyz/embed/movie/${id}`,
+    `https://player.autoembed.co/movie/${id}`,
 ];
 
 const TV_SOURCES = (id, season, episode) => [
-    `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`,
-    `https://2embed.cc/embedtv/${id}&s=${season}&e=${episode}`,
-    `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${season}&e=${episode}`,
+    `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
+    `https://embed.su/embed/tv/${id}/${season}/${episode}`,
+    `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`,
+    `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`,
+    `https://player.autoembed.co/tv/${id}/${season}/${episode}`,
 ];
 
 export function getMoviePlayerSrc(id)                          { return MOVIE_SOURCES(id)[0]; }
@@ -21,8 +25,6 @@ export function getTVAllSources(id, season, episode)           { return TV_SOURC
 
 /**
  * VideoPlayer
- * ─ sandbox WITHOUT allow-top-navigation prevents the embed from redirecting
- *   the parent window (app stays open).
  */
 function VideoPlayer({ src, allSources = [], title = "Video Player", onClose }) {
     const sources = allSources.length ? allSources : [src];
@@ -74,13 +76,7 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose }) 
                             title={title}
                             allowFullScreen
                             allow="autoplay; fullscreen; picture-in-picture"
-                            referrerPolicy="no-referrer"
-                            /*
-                             * CRITICAL: sandbox WITHOUT allow-top-navigation
-                             * stops the iframe from navigating the parent (app)
-                             * away from itself.
-                             */
-                            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups"
+                            referrerPolicy="origin"
                             scrolling="no"
                         />
                     </div>
