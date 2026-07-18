@@ -223,6 +223,63 @@
 }
 
 
+/* Where to Watch */
+.watch-providers-section {
+    margin-bottom: 4rem;
+    padding: 2rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.providers-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.provider-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.provider-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.provider-logo:hover {
+    transform: scale(1.1);
+}
+
+.provider-link-btn {
+    margin-left: auto;
+    color: #a5b4fc;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.provider-link-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: #c7d2fe;
+}
+
+
 /* Cast */
 .section-title {
     font-size: 1.5rem;

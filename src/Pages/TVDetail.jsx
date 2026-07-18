@@ -7,7 +7,6 @@ import {
     getTVEpisodeEmbedUrl
 } from "../Components/Apis";
 import TVCard from "../Components/TVCard";
-import VideoPlayer, { getTVAllSources } from "../Components/VideoPlayer";
 import "../css/TVDetail.css";
 import "../css/MovieDetail.css";
 
@@ -25,10 +24,7 @@ function TVDetail() {
     const [seasonData, setSeasonData] = useState({});         // { [seasonNum]: seasonDetails }
     const [loadingSeason, setLoadingSeason] = useState(null); // which season is being fetched
 
-    // Player
-    const [showPlayer, setShowPlayer] = useState(false);
-    const [playerSrc, setPlayerSrc] = useState("");
-    const [playerTitle, setPlayerTitle] = useState("");
+    // Removed Player state
 
     useEffect(() => {
         const load = async () => {
@@ -64,12 +60,7 @@ function TVDetail() {
         }
     };
 
-    const playEpisode = (seasonNum, ep) => {
-        const label = `${show.name} — S${String(seasonNum).padStart(2,"0")}E${String(ep.episode_number).padStart(2,"0")}: ${ep.name}`;
-        setPlayerSrc(getTVAllSources(id, seasonNum, ep.episode_number)[0]);
-        setPlayerTitle(label);
-        setShowPlayer(true);
-    };
+    // Removed playEpisode
 
     if (loading) {
         return (
@@ -97,18 +88,6 @@ function TVDetail() {
 
     return (
         <div className="movie-detail">
-            {showPlayer && (
-                <VideoPlayer
-                    src={playerSrc}
-                    allSources={getTVAllSources(
-                        id,
-                        playerTitle.match(/S(\d+)/)?.[1],
-                        playerTitle.match(/E(\d+)/)?.[1]
-                    )}
-                    title={playerTitle}
-                    onClose={() => setShowPlayer(false)}
-                />
-            )}
 
             {/* Backdrop */}
             <div
@@ -187,6 +166,35 @@ function TVDetail() {
                     </div>
                 </div>
 
+                {/* Where to Watch */}
+                {show?.["watch/providers"]?.results?.US?.flatrate && (
+                    <div className="watch-providers-section">
+                        <h2 className="section-title">Where to Watch (US)</h2>
+                        <div className="providers-list">
+                            {show["watch/providers"].results.US.flatrate.map(provider => (
+                                <div className="provider-item" key={provider.provider_id} title={provider.provider_name}>
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                                        alt={provider.provider_name}
+                                        className="provider-logo"
+                                    />
+                                    <span>{provider.provider_name}</span>
+                                </div>
+                            ))}
+                            {show["watch/providers"].results.US.link && (
+                                <a
+                                    href={show["watch/providers"].results.US.link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="provider-link-btn"
+                                >
+                                    More info on JustWatch →
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* ── Seasons & Episodes ── */}
                 <div className="seasons-section">
                     <h2 className="section-title">Seasons & Episodes</h2>
@@ -252,13 +260,6 @@ function TVDetail() {
                                                                 }
                                                                 alt={ep.name}
                                                             />
-                                                            <button
-                                                                className="ep-play-btn"
-                                                                onClick={() => playEpisode(season.season_number, ep)}
-                                                                title="Play episode"
-                                                            >
-                                                                ▶
-                                                            </button>
                                                         </div>
                                                         <div className="ep-info">
                                                             <div className="ep-number">

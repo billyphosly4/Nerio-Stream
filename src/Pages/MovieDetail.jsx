@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getMovieDetails, getSimilarMovies } from "../Components/Apis";
 import { useMovieContext } from "../Contexts/MovieContexts";
 import MovieCard from "../Components/MovieCard";
-import VideoPlayer, { getMovieAllSources } from "../Components/VideoPlayer";
+import VideoPlayer from "../Components/VideoPlayer";
 import "../css/MovieDetail.css";
 
 function MovieDetail() {
@@ -41,11 +41,7 @@ function MovieDetail() {
         loadDetails();
     }, [id]);
 
-    const openMovie = () => {
-        setPlayerSrc(getMovieAllSources(id)[0]);
-        setPlayerTitle(movie?.title || "Movie");
-        setShowPlayer(true);
-    };
+    // Removed openMovie
 
     const openTrailer = () => {
         if (!trailerKey) return;
@@ -85,11 +81,11 @@ function MovieDetail() {
 
     return (
         <div className="movie-detail">
-            {/* Video Player Modal */}
+            {/* Video Player Modal (Trailer Only) */}
             {showPlayer && (
                 <VideoPlayer
                     src={playerSrc}
-                    allSources={playerTitle.includes("Trailer") ? [playerSrc] : getMovieAllSources(id)}
+                    allSources={[playerSrc]}
                     title={playerTitle}
                     onClose={() => setShowPlayer(false)}
                 />
@@ -171,10 +167,6 @@ function MovieDetail() {
                         </div>
 
                         <div className="detail-actions">
-                            {/* Primary: Watch Now */}
-                            <button className="watch-now-btn" onClick={openMovie}>
-                                ▶ Watch Now
-                            </button>
                             {/* Trailer */}
                             {trailerKey && (
                                 <button className="trailer-btn" onClick={openTrailer}>
@@ -191,6 +183,35 @@ function MovieDetail() {
                         </div>
                     </div>
                 </div>
+
+                {/* Where to Watch */}
+                {movie?.["watch/providers"]?.results?.US?.flatrate && (
+                    <div className="watch-providers-section">
+                        <h2 className="section-title">Where to Watch (US)</h2>
+                        <div className="providers-list">
+                            {movie["watch/providers"].results.US.flatrate.map(provider => (
+                                <div className="provider-item" key={provider.provider_id} title={provider.provider_name}>
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                                        alt={provider.provider_name}
+                                        className="provider-logo"
+                                    />
+                                    <span>{provider.provider_name}</span>
+                                </div>
+                            ))}
+                            {movie["watch/providers"].results.US.link && (
+                                <a
+                                    href={movie["watch/providers"].results.US.link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="provider-link-btn"
+                                >
+                                    More info on JustWatch →
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Cast */}
                 {cast.length > 0 && (
