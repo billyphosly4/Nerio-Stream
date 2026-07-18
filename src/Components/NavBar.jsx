@@ -1,16 +1,25 @@
-import { NavLink } from "react-router-dom"; // Change Link to NavLink
+import { NavLink } from "react-router-dom";
 import "../css/NavBar.css";
+
 function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <NavLink to="/">Movie App</NavLink>
+        <NavLink to="/">🎬 Nerio Stream</NavLink>
       </div>
       <div className="navbar-links">
-        <NavLink to="/" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Home</NavLink>
-        <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Favorites</NavLink>
+        <NavLink to="/" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} end>
+          Home
+        </NavLink>
+        <NavLink to="/trending" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          🔥 Trending
+        </NavLink>
+        <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          ❤️ Favorites
+        </NavLink>
       </div>
     </nav>
   );
 }
+
 export default NavBar;
