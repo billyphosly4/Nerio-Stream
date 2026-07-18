@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMovieDetails, getSimilarMovies, getMovieEmbedUrl } from "../Components/Apis";
+import { getMovieDetails, getSimilarMovies } from "../Components/Apis";
 import { useMovieContext } from "../Contexts/MovieContexts";
 import MovieCard from "../Components/MovieCard";
-import VideoPlayer from "../Components/VideoPlayer";
+import VideoPlayer, { getMovieAllSources } from "../Components/VideoPlayer";
 import "../css/MovieDetail.css";
 
 function MovieDetail() {
@@ -42,7 +42,7 @@ function MovieDetail() {
     }, [id]);
 
     const openMovie = () => {
-        setPlayerSrc(getMovieEmbedUrl(id));
+        setPlayerSrc(getMovieAllSources(id)[0]);
         setPlayerTitle(movie?.title || "Movie");
         setShowPlayer(true);
     };
@@ -89,6 +89,7 @@ function MovieDetail() {
             {showPlayer && (
                 <VideoPlayer
                     src={playerSrc}
+                    allSources={playerTitle.includes("Trailer") ? [playerSrc] : getMovieAllSources(id)}
                     title={playerTitle}
                     onClose={() => setShowPlayer(false)}
                 />

@@ -7,7 +7,7 @@ import {
     getTVEpisodeEmbedUrl
 } from "../Components/Apis";
 import TVCard from "../Components/TVCard";
-import VideoPlayer from "../Components/VideoPlayer";
+import VideoPlayer, { getTVAllSources } from "../Components/VideoPlayer";
 import "../css/TVDetail.css";
 import "../css/MovieDetail.css";
 
@@ -65,8 +65,9 @@ function TVDetail() {
     };
 
     const playEpisode = (seasonNum, ep) => {
-        setPlayerSrc(getTVEpisodeEmbedUrl(id, seasonNum, ep.episode_number));
-        setPlayerTitle(`${show.name} — S${String(seasonNum).padStart(2,"0")}E${String(ep.episode_number).padStart(2,"0")}: ${ep.name}`);
+        const label = `${show.name} — S${String(seasonNum).padStart(2,"0")}E${String(ep.episode_number).padStart(2,"0")}: ${ep.name}`;
+        setPlayerSrc(getTVAllSources(id, seasonNum, ep.episode_number)[0]);
+        setPlayerTitle(label);
         setShowPlayer(true);
     };
 
@@ -99,6 +100,11 @@ function TVDetail() {
             {showPlayer && (
                 <VideoPlayer
                     src={playerSrc}
+                    allSources={getTVAllSources(
+                        id,
+                        playerTitle.match(/S(\d+)/)?.[1],
+                        playerTitle.match(/E(\d+)/)?.[1]
+                    )}
                     title={playerTitle}
                     onClose={() => setShowPlayer(false)}
                 />
