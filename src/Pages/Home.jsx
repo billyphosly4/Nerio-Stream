@@ -63,19 +63,42 @@ function Home() {
       setLoading(false);
   };
 
+  const handleVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser.");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setSearchQuery(transcript);
+      // Trigger search
+      setSelectedGenre(null);
+      setLoading(true);
+      searchMovies(transcript).then(results => {
+          setMovies(results);
+          setLoading(false);
+      });
+    };
+    recognition.start();
+  };
+
   return (
     <div className="home">
       <div className="hero-section">
           <h1 className="hero-title">Discover Your Next Favorite Movie</h1>
           <p className="hero-subtitle">Explore millions of movies. Dive into curated collections and personalized recommendations.</p>
-          <form onSubmit={handleSearch} className="search-form">
+          <form onSubmit={handleSearch} className="search-form" style={{ position: 'relative', display: 'flex' }}>
             <input 
               type="text" 
               placeholder="Search for movies..." 
               className="search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ flex: 1, paddingRight: '40px' }}
             />
+            <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '110px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Voice Search">🎤</button>
             <button type="submit" className="search-button">Search</button>
           </form>
       </div>

@@ -1,7 +1,15 @@
 export const getContinueWatching = () => {
     try {
         const data = localStorage.getItem("continue_watching");
-        return data ? JSON.parse(data) : [];
+        if (data) return JSON.parse(data);
+        
+        // Mock data to ensure the UI is visible immediately
+        const mockData = [
+            { showId: 1399, showName: "Game of Thrones", posterPath: "/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg", seasonNum: 1, episodeNum: 1, episodeName: "Winter Is Coming" },
+            { showId: 1396, showName: "Breaking Bad", posterPath: "/3xnWaLQjelJDDF7LT1WBo6f4BRe.jpg", seasonNum: 5, episodeNum: 14, episodeName: "Ozymandias" }
+        ];
+        localStorage.setItem("continue_watching", JSON.stringify(mockData));
+        return mockData;
     } catch (e) {
         return [];
     }

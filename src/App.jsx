@@ -8,6 +8,7 @@ import TVShows from './Pages/TVShows';
 import TVDetail from './Pages/TVDetail';
 import LiveTV from './Pages/LiveTV';
 import Profile from './Pages/Profile';
+import AIChat from './Components/AIChat';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path='/profile'        element={<Profile />} />
         </Routes>
       </main>
+      <AIChat />
     </div>
   );
 }

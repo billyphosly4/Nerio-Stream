@@ -59,19 +59,41 @@ function TVShows() {
         setLoading(false);
     };
 
+    const handleVoiceSearch = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice search is not supported in this browser.");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setSearchQuery(transcript);
+            setSelectedGenre(null);
+            setLoading(true);
+            searchTV(transcript).then(results => {
+                setShows(results);
+                setLoading(false);
+            });
+        };
+        recognition.start();
+    };
+
     return (
         <div className="home">
             <div className="hero-section">
                 <h1 className="hero-title">📺 TV Shows & Series</h1>
                 <p className="hero-subtitle">Binge-watch the most popular series, season by season, episode by episode.</p>
-                <form onSubmit={handleSearch} className="search-form">
+                <form onSubmit={handleSearch} className="search-form" style={{ position: 'relative', display: 'flex' }}>
                     <input
                         type="text"
                         placeholder="Search TV shows..."
                         className="search-input"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
+                        style={{ flex: 1, paddingRight: '40px' }}
                     />
+                    <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '110px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Voice Search">🎤</button>
                     <button type="submit" className="search-button">Search</button>
                 </form>
             </div>

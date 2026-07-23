@@ -86,6 +86,19 @@ function LiveTV() {
         setPopupEvent(null);
     };
 
+    const handleVoiceSearch = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice search is not supported in this browser.");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.onresult = (event) => {
+            setSearchQuery(event.results[0][0].transcript);
+        };
+        recognition.start();
+    };
+
     return (
         <div className="live-tv-container">
             {/* EPG Top Bar */}
@@ -98,13 +111,16 @@ function LiveTV() {
                             <option value="Tomorrow">Tomorrow</option>
                             <option value="Upcoming">Upcoming (Week)</option>
                         </select>
-                        <input 
-                            type="text" 
-                            placeholder="Search channels or shows..." 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.85rem' }}
-                        />
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input 
+                                type="text" 
+                                placeholder="Search channels or shows..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '6px 30px 6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.85rem' }}
+                            />
+                            <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '8px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem' }} title="Voice Search">🎤</button>
+                        </div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
