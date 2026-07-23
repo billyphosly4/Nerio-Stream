@@ -145,3 +145,24 @@ export const getTeamSquad = async (teamId = 85) => {
         return [];
     }
 };
+
+// ─── IPTV (Live TV) ───────────────────────────────────────────────────────
+export const getIPTVChannels = async () => {
+    try {
+        const data = await fetchJSON("https://iptv-org.github.io/api/channels.json");
+        return data || [];
+    } catch (err) {
+        console.error("IPTV Channels error:", err);
+        return [];
+    }
+};
+
+export const getIPTVStreams = async () => {
+    try {
+        const data = await fetchJSON("https://iptv-org.github.io/api/streams.json");
+        return data || [];
+    } catch (err) {
+        console.error("IPTV Streams error:", err);
+        return [];
+    }
+};

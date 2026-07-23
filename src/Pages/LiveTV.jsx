@@ -1,20 +1,48 @@
-import { useState, useEffect } from "react";
-import { getLiveMatchDetails, getTeamSquad } from "../Components/Apis";
+import { useState, useEffect, useRef } from "react";
+import { getLiveMatchDetails, getTeamSquad, getIPTVChannels, getIPTVStreams } from "../Components/Apis";
+import Hls from "hls.js";
 import "../css/LiveTV.css";
 
-// Mock Data
-const EPG_CATEGORIES = ["All", "Sport", "News", "International", "Entertainment"];
-const CHANNELS = [
+const HlsVideo = ({ src }) => {
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || !src) return;
+
+        let hls;
+        if (Hls.isSupported()) {
+            hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                video.play().catch(e => console.log("Autoplay prevented", e));
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = src;
+            video.addEventListener('loadedmetadata', () => {
+                video.play().catch(e => console.log("Autoplay prevented", e));
+            });
+        }
+
+        return () => {
+            if (hls) hls.destroy();
+        };
+    }, [src]);
+
+    return <video ref={videoRef} autoPlay loop muted playsInline />;
+};
+
+const DEFAULT_CHANNELS = [
     { id: 'c1', name: 'Nerio Sports HD', category: 'Sport', currentShow: 'Premier League: Arsenal vs Chelsea', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-    { id: 'c2', name: 'Global News 24', category: 'News', currentShow: 'Live World Updates', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-    { id: 'c3', name: 'BBC International', category: 'International', currentShow: 'Documentary: Planet Earth', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-    { id: 'c4', name: 'ESPN Live', category: 'Sport', currentShow: 'NBA Finals: Lakers vs Heat', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4' },
 ];
 
 function LiveTV() {
-    const [activeCategory, setActiveCategory] = useState("Sport");
+    const [activeCategory, setActiveCategory] = useState("All");
     const [multiviewCount, setMultiviewCount] = useState(1); // 1, 2, or 4
-    const [activeStreams, setActiveStreams] = useState([CHANNELS[0]]);
+    const [channels, setChannels] = useState(DEFAULT_CHANNELS);
+    const [categories, setCategories] = useState(["All", "Sport", "News", "International", "Entertainment"]);
+    const [activeStreams, setActiveStreams] = useState([DEFAULT_CHANNELS[0]]);
     
     // Player Controls
     const [abrQuality, setAbrQuality] = useState("Auto");
@@ -38,9 +66,9 @@ function LiveTV() {
     const [searchQuery, setSearchQuery] = useState("");
     const [epgDate, setEpgDate] = useState("Today");
 
-    const filteredChannels = CHANNELS.filter(c => {
-        const matchesCat = activeCategory === "All" || c.category === activeCategory;
-        const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.currentShow.toLowerCase().includes(searchQuery.toLowerCase());
+    const filteredChannels = channels.filter(c => {
+        const matchesCat = activeCategory === "All" || (c.category && c.category.toLowerCase() === activeCategory.toLowerCase());
+        const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || (c.currentShow && c.currentShow.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesCat && matchesSearch;
     });
 
@@ -62,7 +90,6 @@ function LiveTV() {
             });
         }, 25000);
 
-        // Fetch Real Match Data
         const fetchMatchInfo = async () => {
             const data = await getLiveMatchDetails();
             if (data) setMatchData(data);
@@ -70,6 +97,42 @@ function LiveTV() {
             if (squad) setSquadData(squad);
         };
         fetchMatchInfo();
+
+        const fetchIPTV = async () => {
+            try {
+                const [allChannels, allStreams] = await Promise.all([
+                    getIPTVChannels(),
+                    getIPTVStreams()
+                ]);
+                
+                const streamsWithUrl = allStreams.filter(s => s.url && s.channel);
+                const limitedStreams = streamsWithUrl.slice(0, 100);
+                
+                const formattedChannels = limitedStreams.map((stream, idx) => {
+                    const chanInfo = allChannels.find(c => c.id === stream.channel) || {};
+                    let category = 'Entertainment';
+                    if (chanInfo.categories && chanInfo.categories.length > 0) {
+                        category = chanInfo.categories[0];
+                        category = category.charAt(0).toUpperCase() + category.slice(1);
+                    }
+                    return {
+                        id: `iptv_${idx}`,
+                        name: chanInfo.name || stream.channel,
+                        category,
+                        currentShow: stream.title || 'Live Broadcast',
+                        videoUrl: stream.url
+                    };
+                });
+                
+                if (formattedChannels.length > 0) {
+                    setChannels(formattedChannels);
+                    setActiveStreams([formattedChannels[0]]);
+                    const cats = new Set(formattedChannels.map(c => c.category));
+                    setCategories(["All", ...Array.from(cats)]);
+                }
+            } catch (err) { console.error(err); }
+        };
+        fetchIPTV();
 
         return () => { clearTimeout(timer1); clearTimeout(timer2); };
     }, []);
@@ -138,12 +201,13 @@ function LiveTV() {
                         </div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                    {EPG_CATEGORIES.map(cat => (
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', overflowX: 'auto', paddingBottom: '5px' }}>
+                    {categories.map(cat => (
                         <button 
                             key={cat} 
                             className={`epg-category-btn ${activeCategory === cat ? 'active' : ''}`}
                             onClick={() => setActiveCategory(cat)}
+                            style={{ whiteSpace: 'nowrap' }}
                         >
                             {cat}
                         </button>
@@ -193,8 +257,12 @@ function LiveTV() {
                                     {stream ? (
                                         <>
                                             <div className="live-badge">LIVE</div>
-                                            <video src={stream.videoUrl} autoPlay loop muted playsInline />
-                                            <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>
+                                            {stream.videoUrl.includes('.m3u8') ? (
+                                                <HlsVideo src={stream.videoUrl} />
+                                            ) : (
+                                                <video src={stream.videoUrl} autoPlay loop muted playsInline />
+                                            )}
+                                            <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', zIndex: 2 }}>
                                                 {stream.currentShow}
                                             </div>
                                         </>
