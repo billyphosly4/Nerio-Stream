@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getLiveMatchDetails, getTeamSquad, getIPTVChannels, getIPTVStreams } from "../Components/Apis";
+import { getLiveMatchDetails, getTeamSquad, getIPTVChannels, getIPTVStreams, getUpcomingFixtures, getSoccersLeagues } from "../Components/Apis";
 import Hls from "hls.js";
 import "../css/LiveTV.css";
 
@@ -61,6 +61,8 @@ function LiveTV() {
     const [socialTab, setSocialTab] = useState("Chat");
     const [matchData, setMatchData] = useState(null);
     const [squadData, setSquadData] = useState([]);
+    const [upcomingFixtures, setUpcomingFixtures] = useState([]);
+    const [leaguesData, setLeaguesData] = useState([]);
     
     // Filter EPG
     const [searchQuery, setSearchQuery] = useState("");
@@ -70,7 +72,7 @@ function LiveTV() {
         const matchesCat = activeCategory === "All" || (c.category && c.category.toLowerCase() === activeCategory.toLowerCase());
         const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || (c.currentShow && c.currentShow.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesCat && matchesSearch;
-    });
+    }).slice(0, 100); // Slice to 100 strictly for DOM performance
 
     useEffect(() => {
         // Simulate interactive events for Social Stadium
@@ -95,6 +97,10 @@ function LiveTV() {
             if (data) setMatchData(data);
             const squad = await getTeamSquad();
             if (squad) setSquadData(squad);
+            const fixtures = await getUpcomingFixtures();
+            if (fixtures) setUpcomingFixtures(fixtures.slice(0, 20)); // Keep top 20
+            const leagues = await getSoccersLeagues();
+            if (leagues) setLeaguesData(leagues.slice(0, 20)); // Keep top 20 leagues
         };
         fetchMatchInfo();
 
@@ -105,10 +111,9 @@ function LiveTV() {
                     getIPTVStreams()
                 ]);
                 
-                const streamsWithUrl = allStreams.filter(s => s.url && s.channel);
-                const limitedStreams = streamsWithUrl.slice(0, 100);
-                
-                const formattedChannels = limitedStreams.map((stream, idx) => {
+                const streamsWithUrl = allStreams.filter(s => s.url && s.channel && s.url.includes('.m3u8'));
+                // Map ALL valid streams to allow full global search
+                const formattedChannels = streamsWithUrl.map((stream, idx) => {
                     const chanInfo = allChannels.find(c => c.id === stream.channel) || {};
                     let category = 'Entertainment';
                     if (chanInfo.categories && chanInfo.categories.length > 0) {
@@ -125,9 +130,18 @@ function LiveTV() {
                 });
                 
                 if (formattedChannels.length > 0) {
-                    setChannels(formattedChannels);
-                    setActiveStreams([formattedChannels[0]]);
-                    const cats = new Set(formattedChannels.map(c => c.category));
+                    const kenyanChannels = [
+                        { id: 'c_citizentv', name: 'Citizen TV', category: 'News', currentShow: 'Live: News Updates', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+                        { id: 'c_kbctv', name: 'KBC TV', category: 'News', currentShow: 'Live: KBC News', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+                        { id: 'c_ktntv', name: 'KTN TV', category: 'News', currentShow: 'Live: KTN Prime', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+                        { id: 'c_ramogitv', name: 'Ramogi TV', category: 'Entertainment', currentShow: 'Live: Ramogi TV', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
+                    ];
+                    
+                    const finalChannels = [...kenyanChannels, ...formattedChannels];
+                    
+                    setChannels(finalChannels);
+                    setActiveStreams([finalChannels[0]]);
+                    const cats = new Set(finalChannels.map(c => c.category));
                     setCategories(["All", ...Array.from(cats)]);
                 }
             } catch (err) { console.error(err); }
@@ -314,9 +328,11 @@ function LiveTV() {
                             🏟️ Social Stadium
                             <span style={{ fontSize: '0.8rem', background: '#ef4444', padding: '2px 6px', borderRadius: '10px' }}>12.4k watching</span>
                         </div>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button className={`ctrl-btn ${socialTab === 'Chat' ? 'active' : ''}`} onClick={() => setSocialTab("Chat")} style={{ flex: 1 }}>Chat</button>
-                            <button className={`ctrl-btn ${socialTab === 'Data' ? 'active' : ''}`} onClick={() => setSocialTab("Data")} style={{ flex: 1, background: '#6366f1', borderColor: '#4f46e5' }}>Match Data (Live)</button>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            <button className={`ctrl-btn ${socialTab === 'Chat' ? 'active' : ''}`} onClick={() => setSocialTab("Chat")} style={{ flex: 1, padding: '8px' }}>Chat</button>
+                            <button className={`ctrl-btn ${socialTab === 'Data' ? 'active' : ''}`} onClick={() => setSocialTab("Data")} style={{ flex: 1, padding: '8px', background: '#6366f1', borderColor: '#4f46e5' }}>Match</button>
+                            <button className={`ctrl-btn ${socialTab === 'Fixtures' ? 'active' : ''}`} onClick={() => setSocialTab("Fixtures")} style={{ flex: 1, padding: '8px', background: '#10b981', borderColor: '#059669' }}>Fixtures</button>
+                            <button className={`ctrl-btn ${socialTab === 'Leagues' ? 'active' : ''}`} onClick={() => setSocialTab("Leagues")} style={{ flex: 1, padding: '8px', background: '#f59e0b', borderColor: '#d97706' }}>Leagues</button>
                         </div>
                     </div>
 
@@ -358,6 +374,48 @@ function LiveTV() {
                                 </div>
                             ) : (
                                 <div className="loader-sm" style={{ margin: '20px auto' }}></div>
+                            )}
+                        </div>
+                    ) : socialTab === 'Fixtures' ? (
+                        <div style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
+                            <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', color: '#10b981' }}>Upcoming Matches</h3>
+                            {upcomingFixtures.length > 0 ? (
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem' }}>
+                                    {upcomingFixtures.map(fix => (
+                                        <li key={fix.id} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                <strong style={{ color: '#a5b4fc' }}>{fix.league?.name || "League"}</strong>
+                                                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{fix.starting_at ? new Date(fix.starting_at).toLocaleString() : 'TBA'}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ flex: 1, textAlign: 'right' }}>{fix.participants?.[0]?.name || "Team A"}</span>
+                                                <span style={{ padding: '0 10px', color: '#ef4444', fontWeight: 'bold' }}>vs</span>
+                                                <span style={{ flex: 1 }}>{fix.participants?.[1]?.name || "Team B"}</span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '20px' }}>Loading fixtures...</div>
+                            )}
+                        </div>
+                    ) : socialTab === 'Leagues' ? (
+                        <div style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
+                            <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', color: '#f59e0b' }}>Top Leagues (SoccersAPI)</h3>
+                            {leaguesData.length > 0 ? (
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem' }}>
+                                    {leaguesData.map(league => (
+                                        <li key={league.id} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            {league.img && <img src={league.img} alt={league.name} style={{ width: '30px', height: '30px', borderRadius: '50%' }} />}
+                                            <div>
+                                                <strong style={{ color: 'white', display: 'block' }}>{league.name}</strong>
+                                                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{league.country?.name || 'International'}</span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '20px' }}>Loading leagues...</div>
                             )}
                         </div>
                     ) : (

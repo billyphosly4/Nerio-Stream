@@ -124,24 +124,50 @@ export const getTVByGenre = async (genreId, page = 1) => {
 const SPORTMONKS_TOKEN = "Nz1xMD7EinA5zpMSqmzHyMwRyuYkxGPeZUECgCIrrsoBGQjkNs13ts8zyFjE";
 const SPORTMONKS_BASE = "https://api.sportmonks.com/v3";
 
+const fetchSportmonks = async (path) => {
+    const rawUrl = `${SPORTMONKS_BASE}${path}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`;
+    return fetchJSON(proxyUrl);
+};
+
 export const getLiveMatchDetails = async (fixtureId = 216268) => {
     try {
-        const url = `${SPORTMONKS_BASE}/football/fixtures/${fixtureId}?api_token=${SPORTMONKS_TOKEN}&include=participants;league;venue;state;scores;events.type;events.period;events.player;statistics.type;sidelined.sideline.player;sidelined.sideline.type;weatherReport`;
-        const data = await fetchJSON(url);
-        return data.data; // Sportmonks wraps response in 'data'
+        const data = await fetchSportmonks(`/football/fixtures/${fixtureId}?api_token=${SPORTMONKS_TOKEN}&include=participants;league;venue;state;scores;events.type;events.period;events.player;statistics.type;sidelined.sideline.player;sidelined.sideline.type;weatherReport`);
+        return data.data; 
     } catch (err) {
         console.error("Sportmonks fixture error:", err);
         return null;
     }
 };
 
+export const getUpcomingFixtures = async () => {
+    try {
+        const data = await fetchSportmonks(`/football/fixtures?api_token=${SPORTMONKS_TOKEN}&include=participants;league;venue;state`);
+        return data.data || [];
+    } catch (err) {
+        console.error("Sportmonks fixtures error:", err);
+        return [];
+    }
+};
+
 export const getTeamSquad = async (teamId = 85) => {
     try {
-        const url = `${SPORTMONKS_BASE}/football/squads/teams/${teamId}?api_token=${SPORTMONKS_TOKEN}&include=position;detailedPosition;player`;
-        const data = await fetchJSON(url);
+        const data = await fetchSportmonks(`/football/squads/teams/${teamId}?api_token=${SPORTMONKS_TOKEN}&include=position;detailedPosition;player`);
         return data.data || [];
     } catch (err) {
         console.error("Sportmonks squad error:", err);
+        return [];
+    }
+};
+
+// ─── Live Sports (SoccersAPI) ─────────────────────────────────────────
+export const getSoccersLeagues = async () => {
+    try {
+        const url = `https://api.soccersapi.com/v2.2/leagues/?user=41bJK&token=IvbKSOWNBr&t=list`;
+        const data = await fetchJSON(url);
+        return data.data || [];
+    } catch (err) {
+        console.error("SoccersAPI error:", err);
         return [];
     }
 };

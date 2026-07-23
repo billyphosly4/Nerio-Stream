@@ -94,6 +94,7 @@
     min-height: 0;
 }
 .multiview-1 { grid-template-columns: 1fr; }
+.multiview-1 .live-screen { aspect-ratio: 16 / 9; min-height: 400px; }
 .multiview-2 { grid-template-columns: 1fr 1fr; }
 .multiview-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 

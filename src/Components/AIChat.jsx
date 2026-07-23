@@ -7,17 +7,39 @@ function AIChat() {
     ]);
     const [input, setInput] = useState("");
 
-    const handleSend = (e) => {
+    const handleSend = async (e) => {
         e.preventDefault();
-        if (!input.trim()) return;
+        const userText = input.trim();
+        if (!userText) return;
 
-        setMessages(prev => [...prev, { type: 'user', text: input }]);
+        setMessages(prev => [...prev, { type: 'user', text: userText }]);
         setInput("");
 
-        // Mock AI response
-        setTimeout(() => {
-            setMessages(prev => [...prev, { type: 'bot', text: "That sounds great! I'd recommend checking out 'Inception' or 'Interstellar' in the Sci-Fi category. You can find them on the Home page!" }]);
-        }, 1000);
+        const lowerText = userText.toLowerCase();
+
+        try {
+            if (lowerText.startsWith("define ")) {
+                const word = lowerText.split(" ")[1];
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+                if (!res.ok) throw new Error("Word not found");
+                const data = await res.json();
+                const text = data?.[0]?.meanings?.[0]?.definitions?.[0]?.definition || "Word not found.";
+                setMessages(prev => [...prev, { type: 'bot', text: `📖 ${word}: ${text}` }]);
+            } else if (lowerText.includes("joke")) {
+                const res = await fetch("https://v2.jokeapi.dev/joke/Any?safe-mode");
+                const data = await res.json();
+                const text = data.type === 'single' ? data.joke : `${data.setup} - ${data.delivery}`;
+                setMessages(prev => [...prev, { type: 'bot', text: `😂 ${text}` }]);
+            } else if (lowerText.includes("fact")) {
+                const res = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random");
+                const data = await res.json();
+                setMessages(prev => [...prev, { type: 'bot', text: `🧠 Did you know? ${data.text}` }]);
+            } else {
+                setMessages(prev => [...prev, { type: 'bot', text: "I'm Nerio AI! Try typing: 'define <word>', 'joke', or 'fact'!" }]);
+            }
+        } catch (err) {
+            setMessages(prev => [...prev, { type: 'bot', text: "Oops, couldn't fetch that information right now." }]);
+        }
     };
 
     return (
