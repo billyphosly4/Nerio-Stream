@@ -43,12 +43,12 @@ function LiveTV() {
     const [channels, setChannels] = useState(DEFAULT_CHANNELS);
     const [categories, setCategories] = useState(["All", "Sport", "News", "International", "Entertainment"]);
     const [activeStreams, setActiveStreams] = useState([DEFAULT_CHANNELS[0]]);
-    
+
     // Player Controls
     const [abrQuality, setAbrQuality] = useState("Auto");
     const [cdn, setCdn] = useState("Primary CDN (Fastest)");
     const [isRecording, setIsRecording] = useState(false);
-    
+
     // Social Stadium
     const [chatMessages, setChatMessages] = useState([
         { user: "Alex22", text: "What a match!" },
@@ -63,7 +63,7 @@ function LiveTV() {
     const [squadData, setSquadData] = useState([]);
     const [upcomingFixtures, setUpcomingFixtures] = useState([]);
     const [leaguesData, setLeaguesData] = useState([]);
-    
+
     // Filter EPG
     const [searchQuery, setSearchQuery] = useState("");
     const [epgDate, setEpgDate] = useState("Today");
@@ -110,41 +110,40 @@ function LiveTV() {
                     getIPTVChannels(),
                     getIPTVStreams()
                 ]);
-                
+
                 const streamsWithUrl = allStreams.filter(s => s.url && s.channel && s.url.includes('.m3u8'));
-                // Map ALL valid streams to allow full global search
-                const formattedChannels = streamsWithUrl.map((stream, idx) => {
-                    const chanInfo = allChannels.find(c => c.id === stream.channel) || {};
-                    let category = 'Entertainment';
-                    if (chanInfo.categories && chanInfo.categories.length > 0) {
-                        category = chanInfo.categories[0];
-                        category = category.charAt(0).toUpperCase() + category.slice(1);
-                    }
-                    return {
-                        id: `iptv_${idx}`,
-                        name: chanInfo.name || stream.channel,
-                        category,
-                        currentShow: stream.title || 'Live Broadcast',
-                        videoUrl: stream.url
-                    };
-                });
-                
-                if (formattedChannels.length > 0) {
-                    const kenyanChannels = [
-                        { id: 'c_citizentv', name: 'Citizen TV', category: 'News', currentShow: 'Live: News Updates', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
-                        { id: 'c_kbctv', name: 'KBC TV', category: 'News', currentShow: 'Live: KBC News', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
-                        { id: 'c_ktntv', name: 'KTN TV', category: 'News', currentShow: 'Live: KTN Prime', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
-                        { id: 'c_ramogitv', name: 'Ramogi TV', category: 'Entertainment', currentShow: 'Live: Ramogi TV', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
-                    ];
-                    
-                    const finalChannels = [...kenyanChannels, ...formattedChannels];
-                    
-                    setChannels(finalChannels);
-                    setActiveStreams([finalChannels[0]]);
-                    const cats = new Set(finalChannels.map(c => c.category));
+
+                if (streamsWithUrl.length > 0) {
+                    // Map ALL valid streams to allow full global search
+                    const formattedChannels = streamsWithUrl.map((stream, idx) => {
+                        const chanInfo = allChannels.find(c => c.id === stream.channel) || {};
+                        let category = 'Entertainment';
+                        if (chanInfo.categories && chanInfo.categories.length > 0) {
+                            category = chanInfo.categories[0];
+                            category = category.charAt(0).toUpperCase() + category.slice(1);
+                        }
+                        return {
+                            id: `iptv_${idx}`,
+                            name: chanInfo.name || stream.channel,
+                            category,
+                            currentShow: stream.title || 'Live Broadcast',
+                            videoUrl: stream.url
+                        };
+                    });
+
+                    // Only use real channels from API, no mock data
+                    setChannels(formattedChannels);
+                    setActiveStreams([formattedChannels[0]]);
+                    const cats = new Set(formattedChannels.map(c => c.category));
                     setCategories(["All", ...Array.from(cats)]);
+                } else {
+                    // If no streams from API, keep DEFAULT_CHANNELS but don't add mock Kenyan channels
+                    console.log("No IPTV streams available from API");
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error("Error fetching IPTV:", err);
+                // Keep DEFAULT_CHANNELS on error
+            }
         };
         fetchIPTV();
 
@@ -204,9 +203,9 @@ function LiveTV() {
                             <option value="Upcoming">Upcoming (Week)</option>
                         </select>
                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                            <input 
-                                type="text" 
-                                placeholder="Search channels or shows..." 
+                            <input
+                                type="text"
+                                placeholder="Search channels or shows..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{ padding: '6px 30px 6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.85rem' }}
@@ -217,8 +216,8 @@ function LiveTV() {
                 </div>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', overflowX: 'auto', paddingBottom: '5px' }}>
                     {categories.map(cat => (
-                        <button 
-                            key={cat} 
+                        <button
+                            key={cat}
                             className={`epg-category-btn ${activeCategory === cat ? 'active' : ''}`}
                             onClick={() => setActiveCategory(cat)}
                             style={{ whiteSpace: 'nowrap' }}
@@ -229,8 +228,8 @@ function LiveTV() {
                 </div>
                 <div className="epg-timeline">
                     {filteredChannels.map(channel => (
-                        <div 
-                            key={channel.id} 
+                        <div
+                            key={channel.id}
                             className={`epg-channel ${activeStreams.find(c => c.id === channel.id) ? 'active' : ''}`}
                             onClick={() => handleChannelClick(channel)}
                         >
@@ -252,7 +251,7 @@ function LiveTV() {
                     <div className="player-advanced-controls" style={{ background: 'transparent', padding: '0 0 10px 0' }}>
                         <div className="control-group">
                             <span style={{ fontSize: '0.9rem', color: '#9ca3af' }}>Multiview:</span>
-                            <button className={`ctrl-btn ${multiviewCount === 1 ? 'active' : ''}`} onClick={() => {setMultiviewCount(1); setActiveStreams([activeStreams[0]]);}}>1 Screen</button>
+                            <button className={`ctrl-btn ${multiviewCount === 1 ? 'active' : ''}`} onClick={() => { setMultiviewCount(1); setActiveStreams([activeStreams[0]]); }}>1 Screen</button>
                             <button className={`ctrl-btn ${multiviewCount === 2 ? 'active' : ''}`} onClick={() => setMultiviewCount(2)}>2 Screens</button>
                             <button className={`ctrl-btn ${multiviewCount === 4 ? 'active' : ''}`} onClick={() => setMultiviewCount(4)}>4 Screens</button>
                         </div>
@@ -352,9 +351,9 @@ function LiveTV() {
                                             <div style={{ fontWeight: 'bold' }}>{matchData.participants?.[1]?.name || "Team 2"}</div>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ fontSize: '0.85rem', color: '#9ca3af', marginBottom: '15px' }}>
-                                        <strong>Venue:</strong> {matchData.venue?.name || "TBA"} <br/>
+                                        <strong>Venue:</strong> {matchData.venue?.name || "TBA"} <br />
                                         <strong>Status:</strong> {matchData.state?.name || "Upcoming"}
                                     </div>
 
@@ -440,9 +439,9 @@ function LiveTV() {
                             </div>
 
                             <form className="chat-input-area" onSubmit={handleChatSubmit}>
-                                <input 
-                                    type="text" 
-                                    placeholder="Join the conversation..." 
+                                <input
+                                    type="text"
+                                    placeholder="Join the conversation..."
                                     value={chatInput}
                                     onChange={(e) => setChatInput(e.target.value)}
                                 />
