@@ -119,3 +119,29 @@ export const getTVByGenre = async (genreId, page = 1) => {
         return data.results || [];
     } catch (err) { console.error(err); return []; }
 };
+
+// ─── Live Sports (Sportmonks API) ─────────────────────────────────────────
+const SPORTMONKS_TOKEN = "Nz1xMD7EinA5zpMSqmzHyMwRyuYkxGPeZUECgCIrrsoBGQjkNs13ts8zyFjE";
+const SPORTMONKS_BASE = "https://api.sportmonks.com/v3";
+
+export const getLiveMatchDetails = async (fixtureId = 19427191) => {
+    try {
+        const url = `${SPORTMONKS_BASE}/football/fixtures/${fixtureId}?api_token=${SPORTMONKS_TOKEN}&include=participants;league;venue;state;scores;events.type;events.period;events.player;statistics.type;sidelined.sideline.player;sidelined.sideline.type;weatherReport`;
+        const data = await fetchJSON(url);
+        return data.data; // Sportmonks wraps response in 'data'
+    } catch (err) {
+        console.error("Sportmonks fixture error:", err);
+        return null;
+    }
+};
+
+export const getTeamSquad = async (teamId = 85) => {
+    try {
+        const url = `${SPORTMONKS_BASE}/football/squads/teams/${teamId}?api_token=${SPORTMONKS_TOKEN}&include=position;detailedPosition;player`;
+        const data = await fetchJSON(url);
+        return data.data || [];
+    } catch (err) {
+        console.error("Sportmonks squad error:", err);
+        return [];
+    }
+};

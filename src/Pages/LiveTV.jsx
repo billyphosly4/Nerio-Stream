@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getLiveMatchDetails, getTeamSquad } from "../Components/Apis";
 import "../css/LiveTV.css";
 
 // Mock Data
@@ -28,6 +29,11 @@ function LiveTV() {
     const [chatInput, setChatInput] = useState("");
     const [popupEvent, setPopupEvent] = useState(null);
 
+    // Live Match Data
+    const [socialTab, setSocialTab] = useState("Chat");
+    const [matchData, setMatchData] = useState(null);
+    const [squadData, setSquadData] = useState([]);
+    
     // Filter EPG
     const [searchQuery, setSearchQuery] = useState("");
     const [epgDate, setEpgDate] = useState("Today");
@@ -55,6 +61,15 @@ function LiveTV() {
                 options: ["Arsenal", "Chelsea"]
             });
         }, 25000);
+
+        // Fetch Real Match Data
+        const fetchMatchInfo = async () => {
+            const data = await getLiveMatchDetails();
+            if (data) setMatchData(data);
+            const squad = await getTeamSquad();
+            if (squad) setSquadData(squad);
+        };
+        fetchMatchInfo();
 
         return () => { clearTimeout(timer1); clearTimeout(timer2); };
     }, []);
@@ -226,39 +241,89 @@ function LiveTV() {
 
                 {/* Right: Social Stadium */}
                 <div className="social-stadium">
-                    <div className="stadium-header">
-                        🏟️ Social Stadium
-                        <span style={{ fontSize: '0.8rem', background: '#ef4444', padding: '2px 6px', borderRadius: '10px' }}>12.4k watching</span>
-                    </div>
-
-                    {popupEvent && (
-                        <div className="interactive-popup">
-                            <div className="popup-title">{popupEvent.type === 'poll' ? '📊 Live Poll' : '🧠 Trivia'}</div>
-                            <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem' }}>{popupEvent.question}</p>
-                            {popupEvent.options.map(opt => (
-                                <button key={opt} className="poll-option" onClick={() => handlePopupAnswer(opt)}>{opt}</button>
-                            ))}
+                    <div className="stadium-header" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            🏟️ Social Stadium
+                            <span style={{ fontSize: '0.8rem', background: '#ef4444', padding: '2px 6px', borderRadius: '10px' }}>12.4k watching</span>
                         </div>
-                    )}
-
-                    <div className="chat-messages">
-                        {chatMessages.map((msg, i) => (
-                            <div key={i} className="chat-msg">
-                                <span className="chat-user">{msg.user}:</span>
-                                <span>{msg.text}</span>
-                            </div>
-                        ))}
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button className={`ctrl-btn ${socialTab === 'Chat' ? 'active' : ''}`} onClick={() => setSocialTab("Chat")} style={{ flex: 1 }}>Chat</button>
+                            <button className={`ctrl-btn ${socialTab === 'Data' ? 'active' : ''}`} onClick={() => setSocialTab("Data")} style={{ flex: 1, background: '#6366f1', borderColor: '#4f46e5' }}>Match Data (Live)</button>
+                        </div>
                     </div>
 
-                    <form className="chat-input-area" onSubmit={handleChatSubmit}>
-                        <input 
-                            type="text" 
-                            placeholder="Join the conversation..." 
-                            value={chatInput}
-                            onChange={(e) => setChatInput(e.target.value)}
-                        />
-                        <button type="submit" className="ctrl-btn">Send</button>
-                    </form>
+                    {socialTab === 'Data' ? (
+                        <div style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
+                            {matchData ? (
+                                <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '15px' }}>
+                                    <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem', color: '#a5b4fc' }}>Live Match Center</h3>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontWeight: 'bold' }}>{matchData.participants?.[0]?.name || "Team 1"}</div>
+                                        </div>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', background: '#ef4444', padding: '5px 10px', borderRadius: '8px' }}>
+                                            {matchData.scores?.[0]?.score?.goals || 0} - {matchData.scores?.[1]?.score?.goals || 0}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontWeight: 'bold' }}>{matchData.participants?.[1]?.name || "Team 2"}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ fontSize: '0.85rem', color: '#9ca3af', marginBottom: '15px' }}>
+                                        <strong>Venue:</strong> {matchData.venue?.name || "TBA"} <br/>
+                                        <strong>Status:</strong> {matchData.state?.name || "Upcoming"}
+                                    </div>
+
+                                    {squadData.length > 0 && (
+                                        <>
+                                            <h4 style={{ margin: '15px 0 5px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '5px' }}>Team Squad</h4>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem', maxHeight: '150px', overflowY: 'auto' }}>
+                                                {squadData.slice(0, 11).map(sq => (
+                                                    <li key={sq.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                        <span>{sq.player?.display_name || sq.player?.name}</span>
+                                                        <span style={{ color: '#a5b4fc' }}>{sq.position?.name}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="loader-sm" style={{ margin: '20px auto' }}></div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            {popupEvent && (
+                                <div className="interactive-popup">
+                                    <div className="popup-title">{popupEvent.type === 'poll' ? '📊 Live Poll' : '🧠 Trivia'}</div>
+                                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem' }}>{popupEvent.question}</p>
+                                    {popupEvent.options.map(opt => (
+                                        <button key={opt} className="poll-option" onClick={() => handlePopupAnswer(opt)}>{opt}</button>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="chat-messages">
+                                {chatMessages.map((msg, i) => (
+                                    <div key={i} className="chat-msg">
+                                        <span className="chat-user">{msg.user}:</span>
+                                        <span>{msg.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <form className="chat-input-area" onSubmit={handleChatSubmit}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Join the conversation..." 
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                />
+                                <button type="submit" className="ctrl-btn">Send</button>
+                            </form>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
