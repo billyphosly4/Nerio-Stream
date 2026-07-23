@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { getTVShows, searchTV, getTVGenres, getTVByGenre } from "../Components/Apis";
+import { getContinueWatching } from "../utils";
 import TVCard from "../Components/TVCard";
+import { Link } from "react-router-dom";
 import "../css/Home.css";
 
 function TVShows() {
@@ -9,6 +11,7 @@ function TVShows() {
     const [selectedGenre, setSelectedGenre] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
+    const [continueWatching, setContinueWatching] = useState([]);
 
     useEffect(() => {
         const loadInitial = async () => {
@@ -19,6 +22,7 @@ function TVShows() {
             ]);
             setShows(popularShows);
             setGenres(genreList);
+            setContinueWatching(getContinueWatching());
             setLoading(false);
         };
         loadInitial();
@@ -71,6 +75,32 @@ function TVShows() {
                     <button type="submit" className="search-button">Search</button>
                 </form>
             </div>
+
+            {continueWatching.length > 0 && !searchQuery && !selectedGenre && (
+                <div className="continue-watching-section" style={{ padding: '2rem 5%', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '2rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        ▶ Continue Watching
+                    </h2>
+                    <div className="continue-watching-grid" style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+                        {continueWatching.map(item => (
+                            <Link to={`/tv/${item.showId}`} key={item.showId} style={{ textDecoration: 'none', color: 'inherit', flexShrink: 0, width: '250px' }}>
+                                <div className="cw-card" style={{ background: '#1e1e2f', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ position: 'relative', width: '100%', height: '140px' }}>
+                                        <img src={`https://image.tmdb.org/t/p/w500${item.posterPath}`} alt={item.showName} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
+                                        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '4px', background: '#333' }}>
+                                            <div style={{ width: '65%', height: '100%', background: '#6366f1' }}></div>
+                                        </div>
+                                    </div>
+                                    <div style={{ padding: '1rem' }}>
+                                        <h3 style={{ fontSize: '1rem', margin: '0 0 0.5rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.showName}</h3>
+                                        <p style={{ fontSize: '0.85rem', color: '#9ca3af', margin: 0 }}>S{item.seasonNum} E{item.episodeNum} • {item.episodeName}</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="genres-container">
                 {genres.map(genre => (

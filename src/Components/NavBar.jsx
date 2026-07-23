@@ -38,6 +38,9 @@ function NavBar() {
         <NavLink to="/tv" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           📺 TV Shows
         </NavLink>
+        <NavLink to="/live" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          📡 Live & Sports
+        </NavLink>
         <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           ❤️ Favorites
         </NavLink>

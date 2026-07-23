@@ -26,7 +26,7 @@ export function getTVAllSources(id, season, episode)           { return TV_SOURC
 /**
  * VideoPlayer
  */
-function VideoPlayer({ src, allSources = [], title = "Video Player", onClose }) {
+function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, onNextEpisode }) {
     const sources = allSources.length ? allSources : [src];
     const [srcIndex, setSrcIndex] = useState(0);
     const [error, setError] = useState(false);
@@ -87,11 +87,18 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose }) 
                     <p className="vp-disclaimer">
                         ⚠️ Third-party stream · An ad-blocker is recommended
                     </p>
-                    {!error && sources.length > 1 && (
-                        <button className="vp-switch-btn" onClick={tryNext}>
-                            Try another source →
-                        </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        {!error && sources.length > 1 && (
+                            <button className="vp-switch-btn" onClick={tryNext}>
+                                Try another source →
+                            </button>
+                        )}
+                        {onNextEpisode && (
+                            <button className="vp-switch-btn" style={{ background: '#6366f1', borderColor: '#4f46e5', color: '#fff' }} onClick={onNextEpisode}>
+                                Next Episode ⏭
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

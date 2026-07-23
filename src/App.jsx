@@ -6,6 +6,7 @@ import Trending from './Pages/Trending';
 import MovieDetail from './Pages/MovieDetail';
 import TVShows from './Pages/TVShows';
 import TVDetail from './Pages/TVDetail';
+import LiveTV from './Pages/LiveTV';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path='/favourites'     element={<Favourites />} />
           <Route path='/movie/:id'      element={<MovieDetail />} />
           <Route path='/tv/:id'         element={<TVDetail />} />
+          <Route path='/live'           element={<LiveTV />} />
         </Routes>
       </main>
     </div>

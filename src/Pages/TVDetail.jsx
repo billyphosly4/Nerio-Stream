@@ -6,6 +6,7 @@ import {
     getSimilarTV,
     getTVEpisodeEmbedUrl
 } from "../Components/Apis";
+import { saveContinueWatching, getWatchedEpisodes, markEpisodeWatched } from "../utils";
 import TVCard from "../Components/TVCard";
 import VideoPlayer, { getTVAllSources } from "../Components/VideoPlayer";
 import "../css/TVDetail.css";
@@ -29,6 +30,13 @@ function TVDetail() {
     const [showPlayer, setShowPlayer] = useState(false);
     const [playerSrc, setPlayerSrc] = useState("");
     const [playerTitle, setPlayerTitle] = useState("");
+    const [currentPlayingEp, setCurrentPlayingEp] = useState(null); // { seasonNum, ep }
+
+    // Features
+    const [hoveredEpisode, setHoveredEpisode] = useState(null);
+    const [hoverTimer, setHoverTimer] = useState(null);
+    const [watchedEpisodes, setWatchedEpisodes] = useState([]);
+    const [subscribed, setSubscribed] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -47,7 +55,20 @@ function TVDetail() {
             setLoading(false);
         };
         load();
+        setWatchedEpisodes(getWatchedEpisodes(id));
     }, [id]);
+
+    const handleMouseEnter = (epId) => {
+        const timer = setTimeout(() => {
+            setHoveredEpisode(epId);
+        }, 1000); // Auto-play preview after 1s linger
+        setHoverTimer(timer);
+    };
+
+    const handleMouseLeave = () => {
+        if (hoverTimer) clearTimeout(hoverTimer);
+        setHoveredEpisode(null);
+    };
 
     const toggleSeason = async (seasonNum) => {
         if (openSeason === seasonNum) {
@@ -68,7 +89,52 @@ function TVDetail() {
         const label = `${show.name} — S${String(seasonNum).padStart(2,"0")}E${String(ep.episode_number).padStart(2,"0")}: ${ep.name}`;
         setPlayerSrc(getTVAllSources(id, seasonNum, ep.episode_number)[0]);
         setPlayerTitle(label);
+        setCurrentPlayingEp({ seasonNum, ep });
         setShowPlayer(true);
+        
+        // Mark previous as watched
+        markEpisodeWatched(id, seasonNum, ep.episode_number);
+        setWatchedEpisodes(getWatchedEpisodes(id));
+
+        // Save progress mock
+        saveContinueWatching({
+            showId: id,
+            showName: show.name,
+            posterPath: show.poster_path,
+            seasonNum,
+            episodeNum: ep.episode_number,
+            episodeName: ep.name,
+            timestamp: Math.floor(Math.random() * 1800) // mock timestamp
+        });
+    };
+
+    const handleNextEpisode = () => {
+        if (!currentPlayingEp) return;
+        const { seasonNum, ep } = currentPlayingEp;
+        const currentSeasonData = seasonData[seasonNum];
+        if (!currentSeasonData) return;
+        
+        const eps = currentSeasonData.episodes;
+        const currentIndex = eps.findIndex(e => e.id === ep.id);
+        
+        if (currentIndex < eps.length - 1) {
+            // Next episode in same season
+            playEpisode(seasonNum, eps[currentIndex + 1]);
+        } else {
+            // Might need to switch season, mock handling
+            alert("End of season! Open next season to continue.");
+            setShowPlayer(false);
+        }
+    };
+
+    const toggleSubscribe = () => {
+        setSubscribed(!subscribed);
+        alert(subscribed ? "Unsubscribed from notifications." : "You will now be notified when new episodes air!");
+    };
+
+    const downloadEpisode = (e, epName) => {
+        e.stopPropagation();
+        alert(`Downloading "${epName}" for offline viewing...`);
     };
 
     if (loading) {
@@ -107,6 +173,7 @@ function TVDetail() {
                     )}
                     title={playerTitle}
                     onClose={() => setShowPlayer(false)}
+                    onNextEpisode={handleNextEpisode}
                 />
             )}
 
@@ -140,7 +207,12 @@ function TVDetail() {
 
                     {/* Info */}
                     <div className="detail-info">
-                        <h1 className="detail-title">{show.name}</h1>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <h1 className="detail-title">{show.name}</h1>
+                            <button className={`btn-subscribe ${subscribed ? 'active' : ''}`} onClick={toggleSubscribe}>
+                                {subscribed ? "🔕 Subscribed" : "🔔 Get Notified"}
+                            </button>
+                        </div>
                         {show.tagline && <p className="detail-tagline">"{show.tagline}"</p>}
 
                         <div className="detail-badges">
@@ -240,18 +312,36 @@ function TVDetail() {
                                             ) : eps.length === 0 ? (
                                                 <p className="no-eps">No episodes available yet.</p>
                                             ) : (
-                                                eps.map(ep => (
-                                                    <div key={ep.id} className="episode-card">
+                                                eps.map(ep => {
+                                                    const isWatched = watchedEpisodes.includes(`${season.season_number}-${ep.episode_number}`);
+                                                    return (
+                                                    <div 
+                                                        key={ep.id} 
+                                                        className="episode-card"
+                                                        onMouseEnter={() => handleMouseEnter(ep.id)}
+                                                        onMouseLeave={handleMouseLeave}
+                                                    >
                                                         <div className="ep-thumb-wrap">
-                                                            <img
-                                                                className="ep-thumb"
-                                                                src={
-                                                                    ep.still_path
-                                                                        ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
-                                                                        : "https://via.placeholder.com/300x169?text=No+Preview"
-                                                                }
-                                                                alt={ep.name}
-                                                            />
+                                                            {hoveredEpisode === ep.id ? (
+                                                                <video 
+                                                                    className="ep-thumb-video" 
+                                                                    src="https://www.w3schools.com/html/mov_bbb.mp4" 
+                                                                    autoPlay 
+                                                                    loop 
+                                                                    muted 
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                                />
+                                                            ) : (
+                                                                <img
+                                                                    className="ep-thumb"
+                                                                    src={
+                                                                        ep.still_path
+                                                                            ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
+                                                                            : "https://via.placeholder.com/300x169?text=No+Preview"
+                                                                    }
+                                                                    alt={ep.name}
+                                                                />
+                                                            )}
                                                             <button
                                                                 className="ep-play-btn"
                                                                 onClick={() => playEpisode(season.season_number, ep)}
@@ -259,10 +349,21 @@ function TVDetail() {
                                                             >
                                                                 ▶
                                                             </button>
+                                                            {/* Watched Badge */}
+                                                            {isWatched && (
+                                                                <div className="watched-badge" title="Fully Watched">
+                                                                    ✓ Watched
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <div className="ep-info">
-                                                            <div className="ep-number">
-                                                                E{String(ep.episode_number).padStart(2, "0")}
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                <div className="ep-number">
+                                                                    E{String(ep.episode_number).padStart(2, "0")}
+                                                                </div>
+                                                                <button className="ep-download-btn" onClick={(e) => downloadEpisode(e, ep.name)} title="Download Episode">
+                                                                    ⬇ Download
+                                                                </button>
                                                             </div>
                                                             <div className="ep-name">{ep.name}</div>
                                                             <div className="ep-date">{ep.air_date || "TBA"}</div>
