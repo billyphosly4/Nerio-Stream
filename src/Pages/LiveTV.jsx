@@ -29,9 +29,14 @@ function LiveTV() {
     const [popupEvent, setPopupEvent] = useState(null);
 
     // Filter EPG
-    const filteredChannels = activeCategory === "All" 
-        ? CHANNELS 
-        : CHANNELS.filter(c => c.category === activeCategory);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [epgDate, setEpgDate] = useState("Today");
+
+    const filteredChannels = CHANNELS.filter(c => {
+        const matchesCat = activeCategory === "All" || c.category === activeCategory;
+        const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.currentShow.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCat && matchesSearch;
+    });
 
     useEffect(() => {
         // Simulate interactive events for Social Stadium
@@ -87,17 +92,31 @@ function LiveTV() {
             <div className="epg-container">
                 <div className="epg-header">
                     <h2>📡 Live Channel Guide</h2>
-                    <div className="epg-categories">
-                        {EPG_CATEGORIES.map(cat => (
-                            <button 
-                                key={cat} 
-                                className={`epg-category-btn ${activeCategory === cat ? 'active' : ''}`}
-                                onClick={() => setActiveCategory(cat)}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <select className="ctrl-select" value={epgDate} onChange={e => setEpgDate(e.target.value)} style={{ padding: '4px 8px', fontSize: '0.85rem' }}>
+                            <option value="Today">Today</option>
+                            <option value="Tomorrow">Tomorrow</option>
+                            <option value="Upcoming">Upcoming (Week)</option>
+                        </select>
+                        <input 
+                            type="text" 
+                            placeholder="Search channels or shows..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.85rem' }}
+                        />
                     </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                    {EPG_CATEGORIES.map(cat => (
+                        <button 
+                            key={cat} 
+                            className={`epg-category-btn ${activeCategory === cat ? 'active' : ''}`}
+                            onClick={() => setActiveCategory(cat)}
+                        >
+                            {cat}
+                        </button>
+                    ))}
                 </div>
                 <div className="epg-timeline">
                     {filteredChannels.map(channel => (

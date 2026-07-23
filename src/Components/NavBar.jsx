@@ -44,6 +44,9 @@ function NavBar() {
         <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           ❤️ Favorites
         </NavLink>
+        <NavLink to="/profile" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          👤 Profile
+        </NavLink>
         {deferredPrompt && (
           <button className="nav-install-btn" onClick={handleInstallClick}>
             📱 Install App

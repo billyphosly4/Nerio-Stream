@@ -7,6 +7,7 @@ import MovieDetail from './Pages/MovieDetail';
 import TVShows from './Pages/TVShows';
 import TVDetail from './Pages/TVDetail';
 import LiveTV from './Pages/LiveTV';
+import Profile from './Pages/Profile';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path='/movie/:id'      element={<MovieDetail />} />
           <Route path='/tv/:id'         element={<TVDetail />} />
           <Route path='/live'           element={<LiveTV />} />
+          <Route path='/profile'        element={<Profile />} />
         </Routes>
       </main>
     </div>

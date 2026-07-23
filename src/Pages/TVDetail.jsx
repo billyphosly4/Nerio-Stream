@@ -377,7 +377,8 @@ function TVDetail() {
                                                             )}
                                                         </div>
                                                     </div>
-                                                ))
+                                                    );
+                                                })
                                             )}
                                         </div>
                                     )}

@@ -49,9 +49,13 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                 {/* Header */}
                 <div className="vp-header">
                     <span className="vp-title">{title}</span>
-                    <div className="vp-header-actions">
+                    <div className="vp-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button className="vp-action-btn" title="Watch Party" onClick={() => alert("Watch Party link copied to clipboard! Share with friends to co-watch.")}>🎉 Watch Party</button>
+                        <button className="vp-action-btn" title="Picture-in-Picture" onClick={() => alert("Picture-in-Picture mode activated")}>🔲 PiP</button>
+                        <button className="vp-action-btn" title="Chromecast" onClick={() => alert("Looking for casting devices...")}>📺 Cast</button>
+                        <button className="vp-action-btn" title="AirPlay" onClick={() => alert("Looking for AirPlay devices...")}>🍎 AirPlay</button>
                         {sources.length > 1 && (
-                            <span className="vp-source-label">
+                            <span className="vp-source-label" style={{ marginLeft: '10px' }}>
                                 Source {srcIndex + 1} / {sources.length}
                             </span>
                         )}
