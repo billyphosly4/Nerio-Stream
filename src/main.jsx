@@ -1,3 +1,11 @@
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
+
 import { StrictMode } from 'react'
 import { BrowserRouter } from 'react-router-dom'  
 import { createRoot } from 'react-dom/client'
