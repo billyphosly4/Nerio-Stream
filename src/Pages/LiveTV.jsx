@@ -30,7 +30,7 @@ const HlsVideo = ({ src }) => {
         };
     }, [src]);
 
-    return <video ref={videoRef} autoPlay loop muted playsInline />;
+    return <video ref={videoRef} autoPlay loop playsInline />;
 };
 
 const DEFAULT_CHANNELS = [
@@ -273,7 +273,7 @@ function LiveTV() {
                                             {stream.videoUrl.includes('.m3u8') ? (
                                                 <HlsVideo src={stream.videoUrl} />
                                             ) : (
-                                                <video src={stream.videoUrl} autoPlay loop muted playsInline />
+                                                <video src={stream.videoUrl} autoPlay loop playsInline />
                                             )}
                                             <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', zIndex: 2 }}>
                                                 {stream.currentShow}

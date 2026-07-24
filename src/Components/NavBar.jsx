@@ -44,6 +44,18 @@ function NavBar() {
         <NavLink to="/favourites" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           ❤️ Favorites
         </NavLink>
+        <NavLink to="/downloads" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          📥 Downloads
+        </NavLink>
+        <NavLink to="/broadcast" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          📡 Broadcast Hub
+        </NavLink>
+        <NavLink to="/subscriptions" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} style={{ color: '#f59e0b' }}>
+          💎 Premium
+        </NavLink>
+        <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          🛠️ Admin
+        </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           👤 Profile
         </NavLink>

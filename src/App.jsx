@@ -8,6 +8,10 @@ import TVShows from './Pages/TVShows';
 import TVDetail from './Pages/TVDetail';
 import LiveTV from './Pages/LiveTV';
 import Profile from './Pages/Profile';
+import Downloads from './Pages/Downloads';
+import BroadcastHub from './Pages/BroadcastHub';
+import Subscriptions from './Pages/Subscriptions';
+import Admin from './Pages/Admin';
 import AIChat from './Components/AIChat';
 import { Routes, Route } from 'react-router-dom';
 
@@ -25,6 +29,10 @@ function App() {
           <Route path='/tv/:id'         element={<TVDetail />} />
           <Route path='/live'           element={<LiveTV />} />
           <Route path='/profile'        element={<Profile />} />
+          <Route path='/downloads'      element={<Downloads />} />
+          <Route path='/broadcast'      element={<BroadcastHub />} />
+          <Route path='/subscriptions'  element={<Subscriptions />} />
+          <Route path='/admin'          element={<Admin />} />
         </Routes>
       </main>
       <AIChat />

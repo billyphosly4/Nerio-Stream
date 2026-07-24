@@ -51,6 +51,17 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                     <span className="vp-title">{title}</span>
                     <div className="vp-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <button className="vp-action-btn" title="Watch Party" onClick={() => alert("Watch Party link copied to clipboard! Share with friends to co-watch.")}>🎉 Watch Party</button>
+                        <select className="vp-action-btn" title="Quality Selector (ABR)" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer' }}>
+                            <option value="auto">Auto (ABR)</option>
+                            <option value="1080p">1080p</option>
+                            <option value="720p">720p</option>
+                            <option value="480p">480p</option>
+                        </select>
+                        <select className="vp-action-btn" title="Playback Speed" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer' }}>
+                            <option value="1">1.0x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2.0x</option>
+                        </select>
                         <button className="vp-action-btn" title="Picture-in-Picture" onClick={() => alert("Picture-in-Picture mode activated")}>🔲 PiP</button>
                         <button className="vp-action-btn" title="Chromecast" onClick={() => alert("Looking for casting devices...")}>📺 Cast</button>
                         <button className="vp-action-btn" title="AirPlay" onClick={() => alert("Looking for AirPlay devices...")}>🍎 AirPlay</button>
@@ -92,6 +103,9 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                         ⚠️ Third-party stream · An ad-blocker is recommended
                     </p>
                     <div style={{ display: 'flex', gap: '12px' }}>
+                        <button className="vp-switch-btn" style={{ background: 'rgba(255, 255, 255, 0.1)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#fff' }} onClick={() => alert("Skipping Intro/Recap using AI Scene Detection...")}>
+                            ⏭ Skip Intro
+                        </button>
                         {!error && sources.length > 1 && (
                             <button className="vp-switch-btn" onClick={tryNext}>
                                 Try another source →

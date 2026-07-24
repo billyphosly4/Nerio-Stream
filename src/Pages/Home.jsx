@@ -101,6 +101,26 @@ function Home() {
             <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '110px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Voice Search">🎤</button>
             <button type="submit" className="search-button">Search</button>
           </form>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'center' }}>
+            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
+              <option value="">Any Year</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+            </select>
+            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
+              <option value="">Any Rating</option>
+              <option value="8">8+ ⭐</option>
+              <option value="7">7+ ⭐</option>
+              <option value="6">6+ ⭐</option>
+            </select>
+            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
+              <option value="">Sort By Relevance</option>
+              <option value="popular">Most Popular</option>
+              <option value="newest">Newest First</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+          </div>
       </div>
 
       {continueWatching.length > 0 && !searchQuery && !selectedGenre && (
@@ -140,6 +160,21 @@ function Home() {
               </button>
           ))}
       </div>
+
+      {!loading && !searchQuery && !selectedGenre && movies.length > 0 && (
+          <div className="continue-watching-section" style={{ padding: '0 5%', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  ✨ AI Recommended for You
+              </h2>
+              <div className="continue-watching-grid" style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+                  {movies.slice(0, 5).map(movie => (
+                      <div key={`ai-${movie.id}`} style={{ flexShrink: 0, width: '200px' }}>
+                          <MovieCard movie={movie} />
+                      </div>
+                  ))}
+              </div>
+          </div>
+      )}
 
       {loading ? (
         <div className="loading-container">
