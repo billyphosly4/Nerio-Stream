@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ...existing code... */
 :root {
   --primary-color: #e50914; /* Standard "Cinema" Red */

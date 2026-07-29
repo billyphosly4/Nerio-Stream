@@ -149,11 +149,15 @@ function Home() {
           </div>
       )}
 
-      <div className="genres-container">
+      <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide py-4 gap-3">
           {genres.map(genre => (
               <button 
                   key={genre.id} 
-                  className={`genre-pill ${selectedGenre === genre.id ? 'active' : ''}`}
+                  className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                    selectedGenre === genre.id 
+                      ? 'bg-indigo-500 border-indigo-500 text-white' 
+                      : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-700'
+                  }`}
                   onClick={() => handleGenreSelect(genre.id)}
               >
                   {genre.name}
@@ -182,11 +186,11 @@ function Home() {
             <p>Loading movies...</p>
         </div>
       ) : (
-        <div className="movie-grid">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
           {movies.length > 0 ? movies.map((movie) => (
             <MovieCard movie={movie} key={movie.id} />
           )) : (
-            <div className="no-results">No movies found. Try a different search.</div>
+            <div className="col-span-full text-center text-slate-400 py-10">No movies found. Try a different search.</div>
           )}
         </div>
       )}

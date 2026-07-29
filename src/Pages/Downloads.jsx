@@ -14,70 +14,6 @@ const saveDownloads = (list) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 };
 
-// Seed some mock downloads for demo purposes
-const seedMockDownloads = () => {
-    const existing = getDownloads();
-    if (existing.length > 0) return;
-    const mock = [
-        {
-            id: "dl_1",
-            title: "Breaking Bad – S05E14: Ozymandias",
-            type: "episode",
-            quality: "1080p HD",
-            size: "2.4 GB",
-            sizeBytes: 2576980377,
-            progress: 100,
-            status: "completed",
-            thumbnail: "https://image.tmdb.org/t/p/w500/3xnWaLQjelJDDF7LT1WBo6f4BRe.jpg",
-            downloadedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-            duration: "47 min",
-            blob: null
-        },
-        {
-            id: "dl_2",
-            title: "Game of Thrones – S01E01: Winter Is Coming",
-            type: "episode",
-            quality: "4K HDR",
-            size: "8.1 GB",
-            sizeBytes: 8696401408,
-            progress: 100,
-            status: "completed",
-            thumbnail: "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-            downloadedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-            duration: "62 min",
-            blob: null
-        },
-        {
-            id: "dl_3",
-            title: "Interstellar (2014)",
-            type: "movie",
-            quality: "1080p HD",
-            size: "4.7 GB",
-            sizeBytes: 5046586572,
-            progress: 67,
-            status: "paused",
-            thumbnail: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-            downloadedAt: new Date(Date.now() - 3600000 * 1).toISOString(),
-            duration: "169 min",
-            blob: null
-        },
-        {
-            id: "dl_4",
-            title: "The Dark Knight (2008)",
-            type: "movie",
-            quality: "720p",
-            size: "2.1 GB",
-            sizeBytes: 2254857830,
-            progress: 100,
-            status: "completed",
-            thumbnail: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-            downloadedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-            duration: "152 min",
-            blob: null
-        },
-    ];
-    saveDownloads(mock);
-};
 
 function formatBytes(bytes) {
     if (!bytes) return "0 B";
@@ -107,7 +43,6 @@ export default function Downloads() {
     const intervalRef = useRef(null);
 
     useEffect(() => {
-        seedMockDownloads();
         setDownloads(getDownloads());
 
         // Calculate storage estimate
@@ -242,25 +177,6 @@ export default function Downloads() {
         setTimeout(() => setExportMsg(""), 4000);
     };
 
-    const addNewDownload = () => {
-        const newDl = {
-            id: `dl_${Date.now()}`,
-            title: "Oppenheimer (2023)",
-            type: "movie",
-            quality: "4K HDR",
-            size: "18.2 GB",
-            sizeBytes: 19542794240,
-            progress: 0,
-            status: "downloading",
-            thumbnail: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-            downloadedAt: new Date().toISOString(),
-            duration: "180 min",
-            blob: null
-        };
-        const updated = [newDl, ...downloads];
-        saveDownloads(updated);
-        setDownloads(updated);
-    };
 
     const storagePercent = storageInfo.total > 0 ? (storageInfo.used / storageInfo.total) * 100 : 18;
     const totalDownloadedBytes = downloads.filter(d => d.status === "completed").reduce((acc, d) => acc + (d.sizeBytes || 0), 0);
@@ -274,9 +190,7 @@ export default function Downloads() {
                     <p className="dl-subtitle">Manage your offline content and export to local storage</p>
                 </div>
                 <div className="dl-header-actions">
-                    <button className="dl-action-btn primary" onClick={addNewDownload}>
-                        ＋ Add Download
-                    </button>
+
                     <button className="dl-action-btn" onClick={() => exportToLocal(selectedIds)}>
                         📤 Export {selectedIds.size > 0 ? `(${selectedIds.size})` : "All"}
                     </button>

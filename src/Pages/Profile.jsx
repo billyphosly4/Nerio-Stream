@@ -26,7 +26,7 @@ function Profile() {
                             <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Shows Started</div>
                         </div>
                         <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '8px', flex: 1 }}>
-                            <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>14</div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>0</div>
                             <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Hours Watched</div>
                         </div>
                     </div>
@@ -36,21 +36,18 @@ function Profile() {
                     <h3 style={{ marginTop: 0, color: '#f59e0b' }}>🏆 Gamification & Rewards</h3>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '10px' }}>
                         <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '8px', flex: 1, textAlign: 'center' }}>
-                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fcd34d' }}>Lv 12</div>
-                            <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Cinephile</div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fcd34d' }}>Lv 1</div>
+                            <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Newcomer</div>
                         </div>
                         <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '8px', flex: 1, textAlign: 'center' }}>
-                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>2,450</div>
+                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>0</div>
                             <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Nerio Points (XP)</div>
                         </div>
                     </div>
                     <div>
                         <h4 style={{ margin: '10px 0 5px 0', fontSize: '0.9rem', color: '#a5b4fc' }}>Recent Badges Earned:</h4>
                         <div style={{ display: 'flex', gap: '10px' }}>
-                            <span title="Binge Watcher" style={{ fontSize: '1.5rem', cursor: 'help' }}>🍿</span>
-                            <span title="Night Owl" style={{ fontSize: '1.5rem', cursor: 'help' }}>🦉</span>
-                            <span title="Sci-Fi Fanatic" style={{ fontSize: '1.5rem', cursor: 'help' }}>👽</span>
-                            <span title="First Review" style={{ fontSize: '1.5rem', cursor: 'help' }}>✍️</span>
+                            <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>No badges yet. Keep watching to earn some!</span>
                         </div>
                     </div>
                 </div>

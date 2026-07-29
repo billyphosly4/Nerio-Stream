@@ -21,7 +21,7 @@ function Favourites() {
         return (
             <div className="favorites">
                 <h2>Your Favorites</h2>
-                <div className="movie-grid">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
                     {favorites.map((movie) => (
                         <MovieCard movie={movie} key={movie.id} />
                     ))}
