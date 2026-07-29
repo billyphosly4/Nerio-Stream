@@ -27,7 +27,7 @@ function App() {
         <Sidebar isOpen={isSidebarOpen} />
         
         <div className="flex-1 flex flex-col relative min-w-0 w-full max-w-full overflow-x-hidden">
-          <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-24 md:pb-32 px-4 md:px-6 lg:px-8 pt-6 md:pt-8 w-full max-w-full break-words">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden hide-scroll pb-28 w-full max-w-full break-words" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
             <Routes>
               <Route path='/'               element={<Home />} />
               <Route path='/trending'       element={<Trending />} />

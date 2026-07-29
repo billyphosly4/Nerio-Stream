@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { getPopularMovies, searchMovies, getGenres, getMoviesByGenre } from "../Components/Apis";
 import { getContinueWatching } from "../utils";
 import MovieCard from "../Components/MovieCard";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import HeroCarousel from "../Components/HeroCarousel";
 import "../css/Home.css";
 
 function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
@@ -14,123 +16,55 @@ function Home() {
   const [continueWatching, setContinueWatching] = useState([]);
 
   useEffect(() => {
-    const loadInitialData = async () => {
+    getGenres().then(setGenres).catch(console.error);
+    setContinueWatching(getContinueWatching());
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const [popularMovies, genreList] = await Promise.all([
-          getPopularMovies(),
-          getGenres()
-        ]);
-        setMovies(popularMovies);
-        setGenres(genreList);
-        setContinueWatching(getContinueWatching());
+        if (searchQuery) {
+          const results = await searchMovies(searchQuery);
+          setMovies(results);
+        } else if (selectedGenre) {
+          const results = await getMoviesByGenre(selectedGenre);
+          setMovies(results);
+        } else {
+          const popularMovies = await getPopularMovies();
+          setMovies(popularMovies);
+        }
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    loadInitialData();
-  }, []);
+    fetchData();
+  }, [searchQuery, selectedGenre]);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setSelectedGenre(null);
-    if (!searchQuery.trim()) {
-        const popularMovies = await getPopularMovies();
-        setMovies(popularMovies);
-        return;
-    }
-    setLoading(true);
-    const results = await searchMovies(searchQuery);
-    setMovies(results);
-    setLoading(false);
-  };
-
-  const handleGenreSelect = async (genreId) => {
+  const handleGenreSelect = (genreId) => {
       if (selectedGenre === genreId) {
           setSelectedGenre(null);
-          setLoading(true);
-          const popularMovies = await getPopularMovies();
-          setMovies(popularMovies);
-          setLoading(false);
-          return;
+      } else {
+          setSelectedGenre(genreId);
       }
-      setSelectedGenre(genreId);
-      setSearchQuery("");
-      setLoading(true);
-      const results = await getMoviesByGenre(genreId);
-      setMovies(results);
-      setLoading(false);
-  };
-
-  const handleVoiceSearch = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice search is not supported in this browser.");
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setSearchQuery(transcript);
-      // Trigger search
-      setSelectedGenre(null);
-      setLoading(true);
-      searchMovies(transcript).then(results => {
-          setMovies(results);
-          setLoading(false);
-      });
-    };
-    recognition.start();
   };
 
   return (
     <div className="home">
-      <div className="hero-section">
-          <h1 className="hero-title">Discover Your Next Favorite Movie</h1>
-          <p className="hero-subtitle">Explore millions of movies. Dive into curated collections and personalized recommendations.</p>
-          <form onSubmit={handleSearch} className="search-form" style={{ position: 'relative', display: 'flex' }}>
-            <input 
-              type="text" 
-              placeholder="Search for movies..." 
-              className="search-input"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ flex: 1, paddingRight: '40px' }}
-            />
-            <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '110px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Voice Search">🎤</button>
-            <button type="submit" className="search-button">Search</button>
-          </form>
-          <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'center' }}>
-            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
-              <option value="">Any Year</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-            </select>
-            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
-              <option value="">Any Rating</option>
-              <option value="8">8+ ⭐</option>
-              <option value="7">7+ ⭐</option>
-              <option value="6">6+ ⭐</option>
-            </select>
-            <select style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
-              <option value="">Sort By Relevance</option>
-              <option value="popular">Most Popular</option>
-              <option value="newest">Newest First</option>
-              <option value="rating">Highest Rated</option>
-            </select>
-          </div>
-      </div>
+      <HeroCarousel />
+      
+
 
       {continueWatching.length > 0 && !searchQuery && !selectedGenre && (
           <div className="continue-watching-section" style={{ padding: '2rem 5%', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '2rem' }}>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   ▶ Continue Watching
               </h2>
-              <div className="continue-watching-grid" style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+              <div className="continue-watching-grid hide-scroll" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', msOverflowStyle: 'none', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                   {continueWatching.map(item => (
-                      <Link to={`/tv/${item.showId}`} key={item.showId} style={{ textDecoration: 'none', color: 'inherit', flexShrink: 0, width: '250px' }}>
+                      <Link to={`/tv/${item.showId}`} key={item.showId} style={{ textDecoration: 'none', color: 'inherit', flexShrink: 0 }} className="w-48 md:w-64">
                           <div className="cw-card" style={{ background: '#1e1e2f', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s', border: '1px solid rgba(255,255,255,0.05)' }}>
                               <div style={{ position: 'relative', width: '100%', height: '140px' }}>
                                   <img src={`https://image.tmdb.org/t/p/w500${item.posterPath}`} alt={item.showName} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
@@ -149,20 +83,38 @@ function Home() {
           </div>
       )}
 
-      <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide py-4 gap-3">
-          {genres.map(genre => (
-              <button 
-                  key={genre.id} 
-                  className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
-                    selectedGenre === genre.id 
-                      ? 'bg-indigo-500 border-indigo-500 text-white' 
-                      : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-700'
-                  }`}
-                  onClick={() => handleGenreSelect(genre.id)}
-              >
-                  {genre.name}
-              </button>
-          ))}
+      <div className="genres-section" style={{ padding: '2rem 5%', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🎭 Browse by Genre
+          </h2>
+          <div className="flex overflow-x-auto whitespace-nowrap hide-scroll py-2" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none', gap: '1rem' }}>
+              {genres.map(genre => (
+                  <button 
+                      key={genre.id} 
+                      className={`relative flex items-center justify-center rounded-2xl transition-all duration-300 ease-in-out shrink-0 overflow-hidden group ${
+                        selectedGenre === genre.id 
+                          ? 'border-2 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)] scale-105 z-10' 
+                          : 'border border-slate-700/50 hover:scale-105 hover:border-indigo-400/50 hover:shadow-lg hover:z-10'
+                      }`}
+                      style={{ width: '150px', height: '80px', flexShrink: 0 }}
+                      onClick={() => handleGenreSelect(genre.id)}
+                  >
+                      {/* Background */}
+                      <div className={`absolute inset-0 transition-all duration-300 ${
+                          selectedGenre === genre.id 
+                              ? 'bg-gradient-to-br from-indigo-600 to-purple-700 opacity-100' 
+                              : 'bg-slate-800/70 group-hover:bg-slate-700/80'
+                      }`}></div>
+                      
+                      {/* Text */}
+                      <span className={`relative z-10 font-bold tracking-wide transition-all duration-300 ${
+                          selectedGenre === genre.id ? 'text-white text-lg' : 'text-slate-300 group-hover:text-white text-base'
+                      }`}>
+                          {genre.name}
+                      </span>
+                  </button>
+              ))}
+          </div>
       </div>
 
       {!loading && !searchQuery && !selectedGenre && movies.length > 0 && (
@@ -170,9 +122,9 @@ function Home() {
               <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   ✨ AI Recommended for You
               </h2>
-              <div className="continue-watching-grid" style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+              <div className="continue-watching-grid hide-scroll" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', msOverflowStyle: 'none', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                   {movies.slice(0, 5).map(movie => (
-                      <div key={`ai-${movie.id}`} style={{ flexShrink: 0, width: '200px' }}>
+                      <div key={`ai-${movie.id}`} style={{ flexShrink: 0 }} className="w-40 md:w-48 lg:w-56">
                           <MovieCard movie={movie} />
                       </div>
                   ))}
@@ -181,17 +133,19 @@ function Home() {
       )}
 
       {loading ? (
-        <div className="loading-container">
+        <div className="loading-container px-4 py-6">
             <div className="loader"></div>
             <p>Loading movies...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
-          {movies.length > 0 ? movies.map((movie) => (
-            <MovieCard movie={movie} key={movie.id} />
-          )) : (
-            <div className="col-span-full text-center text-slate-400 py-10">No movies found. Try a different search.</div>
-          )}
+        <div className="px-4 py-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {movies.length > 0 ? movies.map((movie) => (
+              <MovieCard movie={movie} key={movie.id} />
+            )) : (
+              <div className="col-span-full text-center text-slate-400 py-10">No movies found. Try a different search.</div>
+            )}
+          </div>
         </div>
       )}
     </div>

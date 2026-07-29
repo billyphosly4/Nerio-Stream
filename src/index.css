@@ -73,6 +73,7 @@ button:focus-visible {
     --surface-color: #ffffff;
     --text-color: #0f172a;
     --text-muted: #64748b;
+  }
 }
 
 /* Hide scrollbar globally for Chrome, Safari and Opera */
@@ -86,4 +87,11 @@ button:focus-visible {
 * {
     -ms-overflow-style: none !important;  /* IE and Edge */
     scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Specific hide-scroll utility */
+.hide-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
