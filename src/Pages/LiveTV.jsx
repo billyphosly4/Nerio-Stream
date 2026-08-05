@@ -3,34 +3,54 @@ import { getLiveMatchDetails, getTeamSquad, getIPTVChannels, getIPTVStreams, get
 import Hls from "hls.js";
 import "../css/LiveTV.css";
 
-const HlsVideo = ({ src }) => {
+const HlsVideo = ({ src, onError, onLoaded }) => {
     const videoRef = useRef(null);
 
     useEffect(() => {
         const video = videoRef.current;
         if (!video || !src) return;
 
+        const handleError = () => onError?.();
+        const handleLoaded = () => onLoaded?.();
+
         let hls;
+        const cleanup = () => {
+            video.removeEventListener('error', handleError);
+            video.removeEventListener('loadedmetadata', handleLoaded);
+            if (hls) hls.destroy();
+        };
+
+        video.addEventListener('error', handleError);
+
         if (Hls.isSupported()) {
             hls = new Hls();
             hls.loadSource(src);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                handleLoaded();
                 video.play().catch(e => console.log("Autoplay prevented", e));
+            });
+            hls.on(Hls.Events.ERROR, (_event, data) => {
+                if (data.fatal) {
+                    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = src;
+                    } else {
+                        handleError();
+                    }
+                }
             });
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = src;
-            video.addEventListener('loadedmetadata', () => {
-                video.play().catch(e => console.log("Autoplay prevented", e));
-            });
+            video.addEventListener('loadedmetadata', handleLoaded);
+            video.play().catch(e => console.log("Autoplay prevented", e));
+        } else {
+            handleError();
         }
 
-        return () => {
-            if (hls) hls.destroy();
-        };
-    }, [src]);
+        return cleanup;
+    }, [src, onError, onLoaded]);
 
-    return <video ref={videoRef} autoPlay loop playsInline />;
+    return <video ref={videoRef} autoPlay loop playsInline controls />;
 };
 
 const DEFAULT_CHANNELS = [
@@ -56,6 +76,22 @@ function LiveTV() {
     ]);
     const [chatInput, setChatInput] = useState("");
     const [popupEvent, setPopupEvent] = useState(null);
+    const [streamErrors, setStreamErrors] = useState({});
+
+    const isPlayableUrl = (url) => typeof url === 'string' && /\.(m3u8|mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+
+    const handleStreamError = (channelId, message = 'Playback unavailable for this stream.') => {
+        setStreamErrors(prev => ({ ...prev, [channelId]: message }));
+    };
+
+    const handleStreamLoaded = (channelId) => {
+        setStreamErrors(prev => {
+            if (!prev[channelId]) return prev;
+            const next = { ...prev };
+            delete next[channelId];
+            return next;
+        });
+    };
 
     // Live Match Data
     const [socialTab, setSocialTab] = useState("Chat");
@@ -111,10 +147,10 @@ function LiveTV() {
                     getIPTVStreams()
                 ]);
 
-                const streamsWithUrl = allStreams.filter(s => s.url && s.channel && s.url.includes('.m3u8'));
+                const streamsWithUrl = allStreams.filter(s => s.url && s.channel);
 
                 if (streamsWithUrl.length > 0) {
-                    // Map ALL valid streams to allow full global search
+                    // Map all streams to allow full global search, even when extension is not obvious.
                     const formattedChannels = streamsWithUrl.map((stream, idx) => {
                         const chanInfo = allChannels.find(c => c.id === stream.channel) || {};
                         let category = 'Entertainment';
@@ -131,18 +167,15 @@ function LiveTV() {
                         };
                     });
 
-                    // Only use real channels from API, no mock data
                     setChannels(formattedChannels);
                     setActiveStreams([formattedChannels[0]]);
                     const cats = new Set(formattedChannels.map(c => c.category));
                     setCategories(["All", ...Array.from(cats)]);
                 } else {
-                    // If no streams from API, keep DEFAULT_CHANNELS but don't add mock Kenyan channels
                     console.log("No IPTV streams available from API");
                 }
             } catch (err) {
                 console.error("Error fetching IPTV:", err);
-                // Keep DEFAULT_CHANNELS on error
             }
         };
         fetchIPTV();
@@ -151,6 +184,12 @@ function LiveTV() {
     }, []);
 
     const handleChannelClick = (channel) => {
+        setStreamErrors(prev => {
+            const next = { ...prev };
+            delete next[channel.id];
+            return next;
+        });
+
         if (multiviewCount === 1) {
             setActiveStreams([channel]);
         } else {
@@ -230,14 +269,17 @@ function LiveTV() {
                     {filteredChannels.map(channel => (
                         <div
                             key={channel.id}
-                            className={`epg-channel ${activeStreams.find(c => c.id === channel.id) ? 'active' : ''}`}
+                            className={`epg-channel ${activeStreams.find(c => c.id === channel.id) ? 'active' : ''} ${streamErrors[channel.id] ? 'error' : ''}`}
                             onClick={() => handleChannelClick(channel)}
                         >
                             <div className="epg-channel-name">
                                 {channel.name}
                                 {channel.category === "Sport" && "⚽"}
                             </div>
-                            <div className="epg-show-title">{channel.currentShow}</div>
+                            <div className="epg-show-title">
+                                {channel.currentShow}
+                                {streamErrors[channel.id] && <span style={{ display: 'block', marginTop: '6px', color: '#f97316', fontSize: '0.75rem' }}>Unavailable</span>}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -270,10 +312,25 @@ function LiveTV() {
                                     {stream ? (
                                         <>
                                             <div className="live-badge">LIVE</div>
-                                            {stream.videoUrl.includes('.m3u8') ? (
-                                                <HlsVideo src={stream.videoUrl} />
+                                            {stream.videoUrl.toLowerCase().includes('.m3u8') ? (
+                                                <HlsVideo
+                                                    src={stream.videoUrl}
+                                                    onError={() => handleStreamError(stream.id, 'HLS playback failed.')}
+                                                    onLoaded={() => handleStreamLoaded(stream.id)}
+                                                />
                                             ) : (
-                                                <video src={stream.videoUrl} autoPlay loop playsInline />
+                                                <video
+                                                    src={stream.videoUrl}
+                                                    autoPlay
+                                                    loop
+                                                    playsInline
+                                                    controls
+                                                    onError={() => handleStreamError(stream.id, 'Playback failed for this stream.')}
+                                                    onLoadedData={() => handleStreamLoaded(stream.id)}
+                                                />
+                                            )}
+                                            {streamErrors[stream.id] && (
+                                                <div className="stream-error-overlay">{streamErrors[stream.id]}</div>
                                             )}
                                             <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', zIndex: 2 }}>
                                                 {stream.currentShow}
