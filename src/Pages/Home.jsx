@@ -52,7 +52,7 @@ function Home() {
   };
 
   return (
-    <div className="home">
+    <div className="home px-6 md:px-8 py-6">
       <HeroCarousel />
       
 
@@ -138,8 +138,8 @@ function Home() {
             <p>Loading movies...</p>
         </div>
       ) : (
-        <div className="px-4 py-6">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="px-0 py-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             {movies.length > 0 ? movies.map((movie) => (
               <MovieCard movie={movie} key={movie.id} />
             )) : (

@@ -3,6 +3,7 @@ import { getTVShows, searchTV, getTVGenres, getTVByGenre } from "../Components/A
 import { getContinueWatching } from "../utils";
 import TVCard from "../Components/TVCard";
 import { Link } from "react-router-dom";
+import HeroCarousel from "../Components/HeroCarousel";
 import "../css/Home.css";
 
 function TVShows() {
@@ -80,22 +81,19 @@ function TVShows() {
     };
 
     return (
-        <div className="home">
-            <div className="hero-section">
-                <h1 className="hero-title">📺 TV Shows & Series</h1>
-                <p className="hero-subtitle">Binge-watch the most popular series, season by season, episode by episode.</p>
-                <form onSubmit={handleSearch} className="search-form" style={{ position: 'relative', display: 'flex' }}>
-                    <input
-                        type="text"
-                        placeholder="Search TV shows..."
-                        className="search-input"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        style={{ flex: 1, paddingRight: '40px' }}
-                    />
-                    <button type="button" onClick={handleVoiceSearch} style={{ position: 'absolute', right: '110px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Voice Search">🎤</button>
-                    <button type="submit" className="search-button">Search</button>
-                </form>
+        <div className="home px-6 md:px-8 py-6">
+            <HeroCarousel />
+
+            <div className="genres-container">
+                {genres.map(genre => (
+                    <button
+                        key={genre.id}
+                        className={`genre-pill ${selectedGenre === genre.id ? "active" : ""}`}
+                        onClick={() => handleGenreSelect(genre.id)}
+                    >
+                        {genre.name}
+                    </button>
+                ))}
             </div>
 
             {continueWatching.length > 0 && !searchQuery && !selectedGenre && (
@@ -124,30 +122,20 @@ function TVShows() {
                 </div>
             )}
 
-            <div className="genres-container">
-                {genres.map(genre => (
-                    <button
-                        key={genre.id}
-                        className={`genre-pill ${selectedGenre === genre.id ? "active" : ""}`}
-                        onClick={() => handleGenreSelect(genre.id)}
-                    >
-                        {genre.name}
-                    </button>
-                ))}
-            </div>
-
             {loading ? (
                 <div className="loading-container">
                     <div className="loader"></div>
                     <p>Loading shows...</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
-                    {shows.length > 0 ? shows.map(show => (
-                        <TVCard show={show} key={show.id} />
-                    )) : (
-                        <div className="no-results">No shows found. Try a different search.</div>
-                    )}
+                <div className="px-6 md:px-8 py-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                        {shows.length > 0 ? shows.map(show => (
+                            <TVCard show={show} key={show.id} />
+                        )) : (
+                            <div className="no-results">No shows found. Try a different search.</div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

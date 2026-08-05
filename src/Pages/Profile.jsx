@@ -11,7 +11,7 @@ function Profile() {
     }, []);
 
     return (
-        <div className="home" style={{ padding: '2rem 5%' }}>
+        <div className="home px-6 md:px-8 py-6" style={{ padding: '2rem 5%' }}>
             <div className="hero-section" style={{ textAlign: 'left', minHeight: 'auto', marginBottom: '2rem' }}>
                 <h1 className="hero-title">👤 User Profile</h1>
                 <p className="hero-subtitle">Manage your viewing activity, stats, and account settings.</p>

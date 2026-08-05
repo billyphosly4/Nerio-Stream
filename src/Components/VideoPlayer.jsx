@@ -1,21 +1,14 @@
 import { useState } from "react";
 import "../css/VideoPlayer.css";
 
-// Multiple embed sources as fallbacks
+// Multiple embed sources as fallbacks. TMDB supplies metadata; the actual
+// playback source needs to come from a separate embed provider chain.
 const MOVIE_SOURCES = (id) => [
-    `https://vidsrc.cc/v2/embed/movie/${id}`,
-    `https://embed.su/embed/movie/${id}`,
     `https://vidsrc.me/embed/movie?tmdb=${id}`,
-    `https://vidsrc.xyz/embed/movie/${id}`,
-    `https://player.autoembed.co/movie/${id}`,
 ];
 
 const TV_SOURCES = (id, season, episode) => [
-    `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
-    `https://embed.su/embed/tv/${id}/${season}/${episode}`,
     `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`,
-    `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`,
-    `https://player.autoembed.co/tv/${id}/${season}/${episode}`,
 ];
 
 export function getMoviePlayerSrc(id)                          { return MOVIE_SOURCES(id)[0]; }
@@ -49,15 +42,15 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                 {/* Header */}
                 <div className="vp-header">
                     <span className="vp-title">{title}</span>
-                    <div className="vp-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div className="vp-header-actions" style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <button className="vp-action-btn" title="Watch Party" onClick={() => alert("Watch Party link copied to clipboard! Share with friends to co-watch.")}>🎉 Watch Party</button>
-                        <select className="vp-action-btn" title="Quality Selector (ABR)" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer' }}>
+                        <select className="vp-action-btn" title="Quality Selector (ABR)" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer', padding: '4px 8px' }}>
                             <option value="auto">Auto (ABR)</option>
                             <option value="1080p">1080p</option>
                             <option value="720p">720p</option>
                             <option value="480p">480p</option>
                         </select>
-                        <select className="vp-action-btn" title="Playback Speed" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer' }}>
+                        <select className="vp-action-btn" title="Playback Speed" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', cursor: 'pointer', padding: '4px 8px' }}>
                             <option value="1">1.0x</option>
                             <option value="1.5">1.5x</option>
                             <option value="2">2.0x</option>
@@ -66,7 +59,7 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                         <button className="vp-action-btn" title="Chromecast" onClick={() => alert("Looking for casting devices...")}>📺 Cast</button>
                         <button className="vp-action-btn" title="AirPlay" onClick={() => alert("Looking for AirPlay devices...")}>🍎 AirPlay</button>
                         {sources.length > 1 && (
-                            <span className="vp-source-label" style={{ marginLeft: '10px' }}>
+                            <span className="vp-source-label" style={{ marginLeft: '4px' }}>
                                 Source {srcIndex + 1} / {sources.length}
                             </span>
                         )}
@@ -93,6 +86,7 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                             allow="autoplay; fullscreen; picture-in-picture"
                             referrerPolicy="origin"
                             scrolling="no"
+                            onError={() => tryNext()}
                         />
                     </div>
                 )}

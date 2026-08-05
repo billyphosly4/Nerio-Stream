@@ -132,9 +132,40 @@ function TVDetail() {
         alert(subscribed ? "Unsubscribed from notifications." : "You will now be notified when new episodes air!");
     };
 
-    const downloadEpisode = (e, epName) => {
+    const downloadEpisode = (e, epName, ep) => {
         e.stopPropagation();
-        alert(`Downloading "${epName}" for offline viewing...`);
+        const queue = JSON.parse(localStorage.getItem("nerio_downloads") || "[]");
+        const item = {
+            id: `tv-${show.id}-${ep.season_number}-${ep.episode_number}-${Date.now()}`,
+            title: `${show.name} · S${String(ep.season_number).padStart(2, "0")}E${String(ep.episode_number).padStart(2, "0")}`,
+            type: "episode",
+            quality: "1080p",
+            size: "650 MB",
+            sizeBytes: 650000000,
+            duration: `${ep.runtime || 45} min`,
+            downloadedAt: new Date().toISOString(),
+            status: "downloading",
+            progress: 0,
+            thumbnail: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : "",
+            downloadUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+        };
+        localStorage.setItem("nerio_downloads", JSON.stringify([item, ...queue]));
+
+        fetch(item.downloadUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const anchor = document.createElement("a");
+                anchor.href = url;
+                anchor.download = `${epName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`;
+                anchor.rel = "noopener";
+                anchor.click();
+                URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error("Episode download failed:", error);
+                alert("This episode cannot be downloaded directly from the current source URL.");
+            });
     };
 
     if (loading) {
@@ -361,7 +392,7 @@ function TVDetail() {
                                                                 <div className="ep-number">
                                                                     E{String(ep.episode_number).padStart(2, "0")}
                                                                 </div>
-                                                                <button className="ep-download-btn" onClick={(e) => downloadEpisode(e, ep.name)} title="Download Episode">
+                                                                <button className="ep-download-btn" onClick={(e) => downloadEpisode(e, ep.name, ep)} title="Download Episode">
                                                                     ⬇ Download
                                                                 </button>
                                                             </div>
@@ -413,9 +444,9 @@ function TVDetail() {
 
                 {/* Similar Shows */}
                 {similar.length > 0 && (
-                    <div className="similar-section">
+                    <div className="similar-section px-6 md:px-8 py-6">
                         <h2 className="section-title">More Like This</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                             {similar.map(s => <TVCard show={s} key={s.id} />)}
                         </div>
                     </div>

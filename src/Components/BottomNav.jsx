@@ -5,15 +5,18 @@ function BottomNav() {
     { to: "/", icon: "🎬", label: "Home", end: true },
     { to: "/trending", icon: "🔥", label: "Trending" },
     { to: "/tv", icon: "📺", label: "TV" },
+    { to: "/live", icon: "📡", label: "Live" },
+    { to: "/favourites", icon: "❤️", label: "Favs" },
     { to: "/downloads", icon: "📥", label: "Downloads" },
+    { to: "/subscriptions", icon: "💎", label: "Premium" },
     { to: "/profile", icon: "👤", label: "Profile" },
   ];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-xl border-t border-slate-800 z-50 pb-safe">
-      <ul className="flex items-center justify-around px-2 py-2">
+      <ul className="flex items-center gap-1 overflow-x-auto px-2 py-2 whitespace-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {navItems.map((item) => (
-          <li key={item.to} className="flex-1">
+          <li key={item.to} className="flex-none min-w-[72px]">
             <NavLink
               to={item.to}
               end={item.end}
