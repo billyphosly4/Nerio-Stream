@@ -63,6 +63,7 @@ function LiveTV() {
     const [channels, setChannels] = useState(DEFAULT_CHANNELS);
     const [categories, setCategories] = useState(["All", "Sport", "News", "International", "Entertainment"]);
     const [activeStreams, setActiveStreams] = useState([DEFAULT_CHANNELS[0]]);
+    const [isLoadingStreams, setIsLoadingStreams] = useState(true);
 
     // Player Controls
     const [abrQuality, setAbrQuality] = useState("Auto");
@@ -141,6 +142,7 @@ function LiveTV() {
         fetchMatchInfo();
 
         const fetchIPTV = async () => {
+            setIsLoadingStreams(true);
             try {
                 const [allChannels, allStreams] = await Promise.all([
                     getIPTVChannels(),
@@ -176,6 +178,8 @@ function LiveTV() {
                 }
             } catch (err) {
                 console.error("Error fetching IPTV:", err);
+            } finally {
+                setIsLoadingStreams(false);
             }
         };
         fetchIPTV();
@@ -230,7 +234,13 @@ function LiveTV() {
     };
 
     return (
-        <div className="live-tv-container">
+        <div className={`live-tv-container ${isLoadingStreams ? 'loading' : ''}`}>
+            {isLoadingStreams && (
+                <div className="live-loading-overlay">
+                    <div className="live-spinner" />
+                    <div className="live-loading-text">Loading channels...</div>
+                </div>
+            )}
             {/* EPG Top Bar */}
             <div className="epg-container">
                 <div className="epg-header">

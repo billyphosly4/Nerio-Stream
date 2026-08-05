@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "../css/VideoPlayer.css";
 
 // Multiple embed sources as fallbacks. TMDB supplies metadata; the actual
@@ -20,11 +20,38 @@ export function getTVAllSources(id, season, episode)           { return TV_SOURC
  * VideoPlayer
  */
 function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, onNextEpisode }) {
+    const containerRef = useRef(null);
+    const iframeRef = useRef(null);
     const sources = allSources.length ? allSources : [src];
     const [srcIndex, setSrcIndex] = useState(0);
     const [error, setError] = useState(false);
 
     const currentSrc = sources[srcIndex];
+
+    const handleFullscreen = () => {
+        const target = iframeRef.current || containerRef.current;
+        if (!target) return;
+
+        const request = target.requestFullscreen || target.webkitRequestFullscreen || target.mozRequestFullScreen || target.msRequestFullscreen;
+        const pageRequest = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
+
+        const invoke = (fn, element) => {
+            if (!fn) return false;
+            try {
+                fn.call(element).catch(() => {
+                    // ignore catch; fallback will try next
+                });
+                return true;
+            } catch {
+                return false;
+            }
+        };
+
+        if (invoke(request, target)) return;
+        if (invoke(pageRequest, document.documentElement)) return;
+
+        alert('Fullscreen mode is not supported or blocked by your browser.');
+    };
 
     const tryNext = () => {
         if (srcIndex < sources.length - 1) {
@@ -58,6 +85,7 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                         <button className="vp-action-btn" title="Picture-in-Picture" onClick={() => alert("Picture-in-Picture mode activated")}>🔲 PiP</button>
                         <button className="vp-action-btn" title="Chromecast" onClick={() => alert("Looking for casting devices...")}>📺 Cast</button>
                         <button className="vp-action-btn" title="AirPlay" onClick={() => alert("Looking for AirPlay devices...")}>🍎 AirPlay</button>
+                        <button className="vp-action-btn" title="Fullscreen" onClick={handleFullscreen}>⛶</button>
                         {sources.length > 1 && (
                             <span className="vp-source-label" style={{ marginLeft: '4px' }}>
                                 Source {srcIndex + 1} / {sources.length}
@@ -77,9 +105,10 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                         </button>
                     </div>
                 ) : (
-                    <div className="vp-iframe-wrap">
+                    <div className="vp-iframe-wrap" ref={containerRef}>
                         <iframe
                             key={currentSrc}
+                            ref={iframeRef}
                             src={currentSrc}
                             title={title}
                             allowFullScreen
@@ -87,6 +116,7 @@ function VideoPlayer({ src, allSources = [], title = "Video Player", onClose, on
                             referrerPolicy="origin"
                             scrolling="no"
                             onError={() => tryNext()}
+                            style={{ width: '100%', height: '100%' }}
                         />
                     </div>
                 )}
