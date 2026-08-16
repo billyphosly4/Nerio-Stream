@@ -150,6 +150,13 @@ function MovieDetail() {
                     src={playerSrc}
                     allSources={playerTitle.includes("Trailer") ? [playerSrc] : getMovieAllSources(id)}
                     title={playerTitle}
+                    overview={movie?.overview}
+                    movie={movie}
+                    similar={similar}
+                    onSelectRecommendation={(item) => {
+                        setShowPlayer(false);
+                        navigate(`/movie/${item.id}`);
+                    }}
                     onClose={() => setShowPlayer(false)}
                 />
             )}

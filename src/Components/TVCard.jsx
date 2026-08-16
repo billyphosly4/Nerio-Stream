@@ -9,7 +9,7 @@ function TVCard({ show }) {
 
     return (
         <Link to={`/tv/${show.id}`} className="movie-card-link">
-            <div className="movie-card">
+            <div className="movie-card overflow-hidden rounded-xl">
                 <div className="movie-poster">
                     <img
                         src={

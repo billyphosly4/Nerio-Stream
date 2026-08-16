@@ -1,257 +1,636 @@
-/* ── Full-screen Modal Backdrop ── */
-.vp-modal {
+/* ── YouTube Watch Modal Backdrop ── */
+.yt-watch-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: #0f0f0f;
     z-index: 9999;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    animation: vp-fade-in 0.25s ease;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    animation: yt-fade 0.2s ease-in-out;
 }
 
-@keyframes vp-fade-in {
-    from { opacity: 0; transform: scale(0.97); }
-    to   { opacity: 1; transform: scale(1); }
+@keyframes yt-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
-/* ── Player Container ── */
-.vp-container {
-    width: min(100%, 760px);
-    max-width: 760px;
+.yt-watch-container {
+    width: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #0f172a;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #0f0f0f;
+    color: #f1f1f1;
+    font-family: Roboto, Arial, sans-serif;
 }
 
-/* ── Header ── */
-.vp-header {
+/* ── Nerio Player Top Bar ── */
+.yt-topbar {
+    height: 60px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.vp-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f8fafc;
-    max-width: 80%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.yt-logo-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.vp-close {
-    background: rgba(255, 255, 255, 0.08);
+.ns-logo-text {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yt-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.yt-create-btn {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    color: #ffffff;
+    padding: 7px 18px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yt-create-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(236, 72, 153, 0.4));
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+}
+
+.yt-close-modal {
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #f8fafc;
-    width: 36px;
-    height: 36px;
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    padding: 0;
 }
 
-.vp-close:hover {
+.yt-close-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.yt-close-modal:hover {
     background: rgba(239, 68, 68, 0.25);
-    border-color: #ef4444;
-    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    transform: scale(1.08);
+}
+
+.yt-close-modal:hover .yt-close-icon {
     transform: rotate(90deg);
 }
 
-/* ── iframe Wrapper (16:9) ── */
-.vp-iframe-wrap {
+/* ── YouTube Watch Body ── */
+.yt-watch-body {
+    display: flex;
+    padding: 24px max(24px, 5vw);
+    gap: 24px;
+    justify-content: center;
+}
+
+.yt-main-column {
+    flex: 1;
+    max-width: 1280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Video Player Screen Box */
+.yt-player-box {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: #000;
+    background: #000000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-.vp-iframe-wrap iframe {
-    position: absolute;
-    inset: 0;
+.yt-video-wrapper {
+    position: relative;
     width: 100%;
     height: 100%;
-    border: none;
+    cursor: pointer;
 }
 
-/* ── Footer ── */
-.vp-footer {
+.yt-video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Center Play/Pause Ripple */
+.yt-click-anim {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    animation: yt-pop 0.5s ease forwards;
+}
+
+@keyframes yt-pop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ── Controls Bar with Yellow Scrubber Line ── */
+.yt-controls-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+    padding: 0 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: opacity 0.25s ease;
+    z-index: 10;
+}
+
+.yt-controls-bar.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.yt-controls-bar.visible {
+    opacity: 1;
+}
+
+/* Bright Yellow Timeline Progress Bar (Matches Screenshot) */
+.yt-progress-container {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.yt-progress-bg {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    transition: height 0.1s ease;
+}
+
+.yt-progress-container:hover .yt-progress-bg {
+    height: 6px;
+}
+
+.yt-progress-buffer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.yt-progress-played {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #ffcc00; /* YouTube Yellow Progress Bar */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.yt-progress-scrubber {
+    width: 12px;
+    height: 12px;
+    background: #ffcc00;
+    border-radius: 50%;
+    margin-right: -6px;
+    box-shadow: 0 0 8px rgba(255, 204, 0, 0.9);
+}
+
+.yt-hover-tooltip {
+    position: absolute;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background: rgba(15, 15, 15, 0.9);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    pointer-events: none;
+}
+
+/* Controls Row */
+.yt-controls-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.3);
-    gap: 1rem;
-    flex-wrap: wrap;
+    height: 36px;
 }
 
-/* ── Disclaimer ── */
-.vp-disclaimer {
-    font-size: 0.78rem;
-    color: #64748b;
-    margin: 0;
-    flex: 1;
-}
-
-/* ── Source switcher ── */
-.vp-switch-btn {
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    color: #a5b4fc;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.vp-switch-btn:hover {
-    background: rgba(99, 102, 241, 0.3);
-    color: #c7d2fe;
-}
-
-/* ── Header Actions ── */
-.vp-header-actions {
+.yt-controls-left,
+.yt-controls-right {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.vp-source-label {
-    font-size: 0.75rem;
-    color: #64748b;
-}
-
-/* ── Error State ── */
-.vp-error {
+.yt-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 16/9;
-    background: #0a0f1e;
-    color: #94a3b8;
-    gap: 0.5rem;
-    text-align: center;
-    padding: 2rem;
+    transition: background 0.15s ease;
 }
 
-.vp-error p { margin: 0; font-size: 1.1rem; }
-.vp-error-sub { font-size: 0.85rem !important; color: #64748b !important; }
+.yt-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
 
-.vp-retry-btn {
-    margin-top: 0.5rem;
-    background: var(--primary-color, #6366f1);
-    border: none;
-    color: white;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+.yt-volume-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yt-volume-slider {
+    width: 52px;
+    height: 3px;
+    accent-color: #ffcc00;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.vp-retry-btn:hover {
-    filter: brightness(1.15);
-    transform: translateY(-2px);
+.yt-time-display {
+    color: #dddddd;
+    font-size: 0.82rem;
+    font-family: Roboto, Arial, sans-serif;
+    margin-left: 6px;
 }
 
-/* ── Responsive ── */
-@media (max-width: 600px) {
-    .vp-modal { padding: 0; }
-    .vp-container {
-        border-radius: 0;
-        max-height: 100dvh;
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .vp-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 12px;
-    }
-
-    .vp-title {
-        max-width: 100%;
-        font-size: 0.9rem;
-    }
-
-    .vp-header-actions {
-        width: 100%;
-        justify-content: flex-start;
-        gap: 6px;
-    }
-
-    .vp-action-btn {
-        font-size: 0.65rem;
-        padding: 4px 7px;
-    }
-
-    .vp-close {
-        width: 32px;
-        height: 32px;
-        margin-left: auto;
-    }
-
-    .vp-footer {
-        padding: 8px 12px;
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .vp-disclaimer {
-        font-size: 0.68rem;
-        line-height: 1.35;
-    }
-
-    .vp-footer > div {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .vp-switch-btn {
-        font-size: 0.7rem;
-        padding: 6px 10px;
-    }
-}
-
-/* ── Additional Action Buttons ── */
-.vp-action-btn {
+.yt-select-btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border: none;
+    color: #ffffff;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    outline: none;
+}
+
+.yt-select-btn option {
+    background: #0f0f0f;
+    color: #fff;
+}
+
+/* ── Metadata & Details Section below Video ── */
+.yt-details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.yt-video-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f1f1f1;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.yt-hashtag {
+    color: #3ea6ff;
+    font-weight: 600;
+}
+
+/* Channel Profile & Action Buttons Row */
+.yt-channel-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 8px;
+}
+
+.yt-channel-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.yt-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yt-channel-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.yt-channel-name {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #f1f1f1;
+    margin: 0;
+}
+
+.yt-sub-count {
+    font-size: 0.78rem;
+    color: #aaaaaa;
+}
+
+.yt-subscribe-btn {
+    background: #ffffff;
+    color: #0f0f0f;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s ease;
+}
+
+.yt-subscribe-btn:hover {
+    background: #e6e6e6;
+}
+
+.yt-subscribe-btn.subscribed {
+    background: #272727;
+    color: #f1f1f1;
+}
+
+/* Action Pill Group */
+.yt-action-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Split Like/Dislike Pill */
+.yt-like-dislike-pill {
+    display: flex;
+    align-items: center;
+    background: #272727;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.yt-like-btn, .yt-dislike-btn {
+    background: transparent;
+    border: none;
+    color: #f1f1f1;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s ease;
+}
+
+.yt-like-btn:hover, .yt-dislike-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.yt-like-btn.active, .yt-dislike-btn.active {
+    color: #3ea6ff;
+}
+
+.yt-pill-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Action Pills (Share, Ask, Download, More) */
+.yt-pill-btn {
+    background: #272727;
+    border: none;
+    color: #f1f1f1;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s ease;
     white-space: nowrap;
 }
 
-.vp-action-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.3);
+.yt-pill-btn:hover {
+    background: #3f3f3f;
 }
+
+.yt-more-btn {
+    padding: 8px 12px;
+    border-radius: 50%;
+}
+
+.yt-share-toast {
+    background: #00875a;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    align-self: flex-start;
+}
+
+/* Description Box */
+.yt-description-box {
+    background: #272727;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: #f1f1f1;
+    line-height: 1.5;
+}
+
+.yt-desc-meta {
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #f1f1f1;
+}
+
+.yt-desc-text {
+    margin: 0;
+    color: #aaaaaa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .yt-topbar { padding: 0 8px; }
+    .yt-search-group { margin: 0 8px; }
+    .yt-watch-body { padding: 12px; }
+    .yt-video-title { font-size: 1.05rem; }
+    .yt-channel-row { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── More Like This Recommendations Section ── */
+.yt-more-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yt-more-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yt-more-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.yt-more-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.yt-more-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+.yt-more-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    background: #1e293b;
+}
+
+.yt-more-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.yt-more-card:hover .yt-more-thumb img {
+    transform: scale(1.06);
+}
+
+.yt-more-rating {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    color: #fbbf24;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.yt-more-card-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.yt-more-card-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.yt-more-card-year {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+
 

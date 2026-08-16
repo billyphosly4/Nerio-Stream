@@ -22,7 +22,7 @@ function TopNavbar({ toggleSidebar }) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full h-16 bg-[#0f172a] border-b border-slate-800/80 z-50 px-2 py-4 md:px-8 flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full h-16 bg-[#0f172a] border-b border-slate-800/80 z-50 px-2 py-4 md:px-8 flex items-center justify-between pt-safe">
         <div className="flex items-center justify-between w-full h-full gap-2 min-w-0">
           <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
             <button

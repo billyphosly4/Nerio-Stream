@@ -52,13 +52,11 @@ function Home() {
   };
 
   return (
-    <div className="home px-6 md:px-8 py-6">
+    <div className="home px-6 md:px-8 py-6 my-6 space-y-8">
       <HeroCarousel />
-      
-
 
       {continueWatching.length > 0 && !searchQuery && !selectedGenre && (
-          <div className="continue-watching-section" style={{ padding: '2rem 5%', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '2rem' }}>
+          <div className="continue-watching-section rounded-2xl" style={{ padding: '2rem 5%', background: 'rgba(99, 102, 241, 0.05)', marginBottom: '2rem' }}>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   ▶ Continue Watching
               </h2>
@@ -83,7 +81,7 @@ function Home() {
           </div>
       )}
 
-      <div className="genres-section" style={{ padding: '2rem 5%', marginBottom: '1rem' }}>
+      <div className="genres-section" style={{ padding: '1rem 0', marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               🎭 Browse by Genre
           </h2>
@@ -118,7 +116,7 @@ function Home() {
       </div>
 
       {!loading && !searchQuery && !selectedGenre && movies.length > 0 && (
-          <div className="continue-watching-section" style={{ padding: '0 5%', marginBottom: '2rem' }}>
+          <div className="continue-watching-section" style={{ padding: '0', marginBottom: '2rem' }}>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   ✨ AI Recommended for You
               </h2>
@@ -138,8 +136,8 @@ function Home() {
             <p>Loading movies...</p>
         </div>
       ) : (
-        <div className="px-0 py-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="px-0 py-4 my-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-6">
             {movies.length > 0 ? movies.map((movie) => (
               <MovieCard movie={movie} key={movie.id} />
             )) : (

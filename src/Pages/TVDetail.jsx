@@ -203,6 +203,13 @@ function TVDetail() {
                         playerTitle.match(/E(\d+)/)?.[1]
                     )}
                     title={playerTitle}
+                    overview={currentPlayingEp?.ep?.overview || show?.overview}
+                    show={show}
+                    similar={similar}
+                    onSelectRecommendation={(item) => {
+                        setShowPlayer(false);
+                        navigate(`/tv/${item.id}`);
+                    }}
                     onClose={() => setShowPlayer(false)}
                     onNextEpisode={handleNextEpisode}
                 />

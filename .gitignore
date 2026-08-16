@@ -22,3 +22,28 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor / Android / iOS native build artifacts (ignore outputs, keep project files)
+# Android build outputs
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/.cxx/
+/android/local.properties
+/android/**/gradle-wrapper.jar
+/android/**/*.iml
+/android/keystore/
+
+# iOS build outputs
+/ios/Pods/
+/ios/DerivedData/
+/ios/build/
+/ios/Pods/
+/ios/Podfile.lock
+
+# IDE and Gradle caches
+/.idea/
+.gradle/
+
+# Do NOT ignore the android/ or ios/ root folders entirely if you want to commit native projects.
+# The rules above only ignore generated build artifacts so Vercel's web deployment remains unaffected.

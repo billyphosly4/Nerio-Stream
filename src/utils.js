@@ -33,3 +33,23 @@ export const markEpisodeWatched = (showId, seasonNum, episodeNum) => {
         localStorage.setItem(`watched_${showId}`, JSON.stringify(list));
     }
 };
+
+export const getCustomStreamUrl = (id) => {
+    try {
+        const streams = JSON.parse(localStorage.getItem("nerio_custom_streams") || "{}");
+        return streams[id] || null;
+    } catch {
+        return null;
+    }
+};
+
+export const saveCustomStreamUrl = (id, url) => {
+    try {
+        const streams = JSON.parse(localStorage.getItem("nerio_custom_streams") || "{}");
+        streams[id] = url;
+        localStorage.setItem("nerio_custom_streams", JSON.stringify(streams));
+    } catch (e) {
+        console.error("Failed to save custom stream:", e);
+    }
+};
+

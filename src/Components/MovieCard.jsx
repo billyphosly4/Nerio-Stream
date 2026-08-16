@@ -20,7 +20,7 @@ function MovieCard({ movie }) {
 
     return (
         <Link to={`/movie/${movie.id}`} className="movie-card-link">
-            <div className="movie-card">
+            <div className="movie-card overflow-hidden rounded-xl">
                 <div className="movie-poster">
                     <img
                         src={
